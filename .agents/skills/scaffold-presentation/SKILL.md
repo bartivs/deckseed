@@ -15,15 +15,16 @@ compatibility: Node.js 20 or newer
 4. After approval, choose a lowercase kebab-case slug and run:
 
    ```bash
-   npm run new -- <slug> --title "<TITLE>" --languages en,es --default-language auto --themes midnight,paper --default-theme auto
+   npm run new -- <slug> --title "<TITLE>" --languages en,es --default-language auto --theme midnight
    ```
 
 5. Replace the generated `presentations/<slug>/content.md` with the approved brief and slide-by-slide copy before changing the HTML. Treat this Markdown file as the source artifact for the presentation.
 6. Implement `index.html` and `deck.config.js` from `content.md`. Do not add ideas or materially change the approved structure without returning to chat and obtaining approval.
 7. Edit only the generated files under `presentations/<slug>/` for deck-specific content.
-8. Use stable `data-i18n` keys for every user-visible string. Edit the generated `themes` object rather than hardcoding a theme in the harness.
-9. Run `npm run validate` and `npm test`.
-10. Confirm `git status --short` does not show the generated presentation.
+8. Use stable `data-i18n` keys for every user-visible string. Select the fixed presentation theme in `deck.config.js`; do not add a viewer-facing theme selector.
+9. Run `npm run bundle -- <slug>` after configuration or shared-runtime changes. The resulting `index.html` must contain its CSS, configuration, and JavaScript inline so it can be shared alone.
+10. Run `npm run validate` and `npm test`.
+11. Confirm `git status --short` does not show the generated presentation.
 
 ## Constraints
 
@@ -31,4 +32,5 @@ compatibility: Node.js 20 or newer
 - Do not place private presentation content in tracked templates, tests, examples, or README files.
 - Keep reusable navigation, localization, and visual behavior in `src/`; keep deck content local.
 - Keep `content.md`, `index.html`, and `deck.config.js` synchronized; Markdown approval does not authorize unrelated additions during HTML implementation.
+- Generated `index.html` files must be self-contained: no local stylesheet, configuration, or script dependencies.
 - Use `--force` only when the user explicitly approves replacing an existing local deck.

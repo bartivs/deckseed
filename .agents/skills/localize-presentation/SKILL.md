@@ -45,9 +45,10 @@ Do not change this order without an explicit compatibility decision:
 3. Mark text with `data-i18n`, trusted local markup with `data-i18n-html`, and accessible labels with `data-i18n-aria-label`.
 4. Keep product names, API identifiers, enum values, code, and URLs unchanged unless localization is intentional.
 5. Set `direction: "rtl"` for right-to-left languages.
-6. Test explicit selection with `?lang=<code>` and automatic selection with the browser language.
-7. Run `npm run validate` and `npm test`.
+6. Run `npm run bundle -- <slug>` so the updated configuration is embedded in the self-contained `index.html`.
+7. Test explicit selection with `?lang=<code>` and automatic selection with the browser language.
+8. Run `npm run validate` and `npm test`.
 
 ## Failure behavior
 
-A missing translation falls back to `fallbackLanguage`; if still missing, the translation key is shown. Treat visible keys as validation defects rather than silently inventing text.
+A missing translation falls back to `fallbackLanguage`; if still missing, the translation key is shown. Treat visible keys as validation defects rather than silently inventing text. Treat a stale inline configuration or an external runtime dependency as a validation defect.

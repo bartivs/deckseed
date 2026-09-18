@@ -5,17 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="{{TITLE}}">
   <title>{{TITLE}}</title>
-  <link rel="stylesheet" href="../../src/harness.css">
+  <style data-harness-bundle>
+{{HARNESS_CSS}}
+  </style>
 </head>
 <body>
   <aside class="presentation-preferences">
     <div class="preference-control" data-language-control>
       <label for="presentation-language" data-i18n="controls.language">Language</label>
       <select id="presentation-language" data-language-select aria-label="Language"></select>
-    </div>
-    <div class="preference-control" data-theme-control>
-      <label for="presentation-theme" data-i18n="controls.theme">Theme</label>
-      <select id="presentation-theme" data-theme-select aria-label="Theme"></select>
     </div>
   </aside>
 
@@ -45,13 +43,17 @@
 
   <div class="keyboard-hint" data-i18n="controls.hint">← → navigate · F fullscreen · P print</div>
   <nav class="presentation-controls" data-i18n-aria-label="controls.navigation">
-    <button type="button" data-previous data-i18n-aria-label="controls.previous">←</button>
+    <button type="button" data-previous onclick="window.presentationMove(-1)" data-i18n-aria-label="controls.previous">←</button>
     <span class="slide-counter" data-slide-counter>1 / 2</span>
-    <button type="button" data-next data-i18n-aria-label="controls.next">→</button>
+    <button type="button" data-next onclick="window.presentationMove(1)" data-i18n-aria-label="controls.next">→</button>
   </nav>
   <div class="progress" data-progress aria-hidden="true"></div>
 
-  <script src="./deck.config.js"></script>
-  <script type="module" src="../../src/presentation-harness.js"></script>
+  <script data-presentation-config>
+{{PRESENTATION_CONFIG}}
+  </script>
+  <script data-presentation-harness>
+{{PRESENTATION_HARNESS}}
+  </script>
 </body>
 </html>

@@ -31,6 +31,12 @@ createServer(async (request, response) => {
     if (!target) { response.writeHead(403); response.end("Forbidden"); return; }
     let info = await stat(target);
     if (info.isDirectory()) {
+      const requestUrl = new URL(request.url, "http://localhost");
+      if (!requestUrl.pathname.endsWith("/")) {
+        response.writeHead(308, { Location: `${requestUrl.pathname}/${requestUrl.search}` });
+        response.end();
+        return;
+      }
       const index = path.join(target, "index.html");
       try { if ((await stat(index)).isFile()) { target = index; info = await stat(index); } }
       catch {

@@ -1,6 +1,6 @@
 # Presentation Harness
 
-A dependency-free HTML presentation harness with keyboard/touch navigation, print support, configurable localization, and user-defined themes. Shared Agent Skills make the same workflows available to Pi, OpenCode, Claude Code, and Codex. The harness is tracked; presentation content stays local and is ignored by Git.
+A dependency-free HTML presentation harness with keyboard/touch navigation, print support, configurable localization, and presentation-defined themes. Generated decks inline their CSS, configuration, and runtime into one self-contained `index.html` that can be shared or opened directly. Shared Agent Skills make the same workflows available to Pi, OpenCode, Claude Code, and Codex. The harness is tracked; presentation content stays local and is ignored by Git.
 
 ## Quick start
 
@@ -11,15 +11,14 @@ npm run new -- architecture-review \
   --title "Architecture Review" \
   --languages en,es \
   --default-language auto \
-  --themes midnight,paper \
-  --default-theme auto
+  --theme midnight
 
 npm run serve
 ```
 
-The generator creates `content.md` before `index.html` and `deck.config.js`. Replace its starter copy with the approved brief and slide-by-slide content, then implement the HTML from that source artifact. Keep all three files aligned.
+The generator creates `content.md` before `index.html` and `deck.config.js`. Replace its starter copy with the approved brief and slide-by-slide content, then implement the HTML from that source artifact. Keep all three files aligned and run `npm run bundle -- architecture-review` after configuration changes.
 
-Open `http://127.0.0.1:4173/presentations/architecture-review/`.
+Open `http://127.0.0.1:4173/presentations/architecture-review/`. The trailing slash is intentional. You can also copy or double-click `presentations/architecture-review/index.html`; it has no local CSS, configuration, or JavaScript dependencies.
 
 ## Privacy boundary
 
@@ -51,8 +50,8 @@ window.PRESENTATION_CONFIG = {
     es: { "slides.title.heading": "Revisión de arquitectura" },
     ar: { "slides.title.heading": "مراجعة البنية" }
   },
+  theme: "midnight",
   fallbackTheme: "midnight",
-  defaultTheme: "auto",
   themes: {
     midnight: {
       label: "Midnight",
@@ -90,25 +89,23 @@ The harness matches regional browser values such as `es-ES` to a configured base
 
 `data-i18n-html` is intended only for trusted, repository-local translation content.
 
-## User-defined themes
+## Presentation-defined theme
 
-Deck authors define themes in `deck.config.js` with semantic CSS custom properties. The runtime builds the selector from that object; no theme IDs are hard-coded in the browser harness. The generator offers `midnight`, `paper`, and `ember` starting points, which can be renamed or replaced locally.
+Deck authors define themes in `deck.config.js` with semantic CSS custom properties and select one with `theme`. The choice is part of the presentation definition, not a viewer preference; there is no runtime theme selector, URL override, or stored theme choice.
 
-Theme selection precedence:
+Theme resolution is deterministic:
 
-1. `?theme=<id>` URL parameter
-2. Saved user selection
-3. OS light/dark preference when `defaultTheme: "auto"`
-4. Configured default
-5. Fallback theme
-6. First configured theme
+1. Configured `theme`
+2. Configured `fallbackTheme`
+3. First configured theme
 
-The selector is hidden automatically when a deck has only one theme.
+The generator offers `midnight`, `paper`, and `ember` starting points. After changing the definition, run `npm run bundle -- <slug>` to refresh the inline configuration in `index.html`.
 
 ## Commands
 
 ```bash
 npm run new -- <slug> [options]  # Generate an ignored local deck
+npm run bundle -- <slug>         # Refresh inline CSS, config, and runtime
 npm run serve                    # Serve harness and local decks on port 4173
 npm run open -- <presentation>   # Start the server and open a deck
 npm run validate                 # Validate templates and local decks
@@ -120,8 +117,7 @@ Generator options:
 - `--title "Title"`
 - `--languages en,es,fr`
 - `--default-language auto|<code>`
-- `--themes midnight,paper,ember`
-- `--default-theme auto|<id>`
+- `--theme midnight|paper|ember`
 - `--force` to replace an existing generated deck
 
 ## Repository structure
@@ -144,7 +140,7 @@ The repository separates work into five shared Agent Skills:
 - `scaffold-presentation` — get content approval, create `content.md`, then generate a new ignored deck
 - `open-presentation` — start the server and launch a local deck
 - `localize-presentation` — configure languages and translation keys
-- `theme-presentation` — define and check user-selectable themes
+- `theme-presentation` — define and check the fixed presentation theme
 - `validate-presentation` — test rendering, localization, themes, and privacy boundaries
 
 The canonical skills live in `.agents/skills/`:
@@ -162,6 +158,7 @@ To open a deck without launching a desktop browser, use `npm run open -- <presen
 
 - `←` / `PageUp`: previous slide
 - `→` / `PageDown` / `Space`: next slide
+- Click the right 75% of a slide: next slide; click the left 25%: previous slide
 - `Home` / `End`: first or last slide
 - `F`: fullscreen
 - `P`: print

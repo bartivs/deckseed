@@ -11,6 +11,7 @@
 - Always develop and iterate on presentation ideas, audience, narrative, and slide outline with the user in chat first.
 - Do not create or change presentation content until the user explicitly approves the proposed direction and outline.
 - After approval, record the approved brief and slide-by-slide copy in `presentations/<slug>/content.md` before implementing it in `index.html` and `deck.config.js`.
+- Run `npm run bundle -- <slug>` after changing deck configuration or shared runtime files; `index.html` must remain self-contained and shareable by itself.
 - Treat `content.md` as the source artifact for the HTML presentation. Keep the implementation aligned with it, and return to chat for approval before introducing material changes to the approved content or structure.
 
 ## Workflow
@@ -20,7 +21,7 @@ Use the shared Agent Skills under `.agents/skills/`:
 - `scaffold-presentation` to create a deck.
 - `open-presentation` to launch a local deck in the browser.
 - `localize-presentation` to configure languages and translations.
-- `theme-presentation` to define and test user-selectable themes.
+- `theme-presentation` to define and test the fixed presentation theme.
 - `validate-presentation` before completion.
 
 ## Architecture
@@ -29,6 +30,7 @@ Use the shared Agent Skills under `.agents/skills/`:
 - Generator/server/validation logic belongs in `scripts/`.
 - Tracked scaffolding belongs in `templates/`.
 - Deck-specific copy, translations, images, `content.md`, and configuration belong in ignored `presentations/`.
+- Generated presentation HTML must inline its CSS, configuration, and runtime. Do not add viewer-facing theme selectors.
 - Keep the harness dependency-free unless a requirement cannot reasonably be implemented with browser and Node.js standard APIs.
 
 ## Verification

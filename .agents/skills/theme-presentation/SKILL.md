@@ -1,6 +1,6 @@
 ---
 name: theme-presentation
-description: Defines, customizes, or validates user-selectable presentation themes. Use when changing colors, typography, visual tokens, light/dark behavior, theme defaults, or the runtime theme selector.
+description: Defines, customizes, or validates the presentation-defined theme. Use when changing colors, typography, visual tokens, light/dark styling, or the fixed theme selected by a deck.
 license: MIT
 compatibility: Node.js 20 or newer
 ---
@@ -9,45 +9,44 @@ compatibility: Node.js 20 or newer
 
 ## Theme contract
 
-Themes are deck configuration, not hardcoded harness branches:
+Themes are presentation configuration, not runtime viewer preferences. The deck definition selects exactly one active theme with `theme`; the presentation UI must not expose a theme selector.
 
 ```js
-themes: {
-  midnight: {
-    label: "Midnight",
-    colorScheme: "dark",
-    variables: {
-      "--harness-bg": "#07111f",
-      "--harness-panel": "#12243a",
-      "--harness-text": "#f2f7fb",
-      "--harness-muted": "#9db1c7",
-      "--harness-accent": "#56d7e8"
+window.PRESENTATION_CONFIG = {
+  theme: "midnight",
+  fallbackTheme: "midnight",
+  themes: {
+    midnight: {
+      label: "Midnight",
+      colorScheme: "dark",
+      variables: {
+        "--harness-bg": "#07111f",
+        "--harness-panel": "#12243a",
+        "--harness-text": "#f2f7fb",
+        "--harness-muted": "#9db1c7",
+        "--harness-accent": "#56d7e8"
+      }
     }
   }
-}
+};
 ```
 
-## Selection precedence
-
-1. `?theme=<id>` URL override
-2. Saved user selection
-3. OS light/dark preference when `defaultTheme` is `auto`
-4. Configured `defaultTheme`
-5. `fallbackTheme`
-6. First configured theme
+The runtime uses `theme`, then `fallbackTheme`, then the first configured theme. URL parameters, local storage, OS preference, and viewer controls do not change it.
 
 ## Procedure
 
-1. Add a stable lowercase theme ID under `themes`.
-2. Define a human-readable label, `colorScheme`, and CSS custom properties.
-3. Keep theme tokens global and semantic; do not encode slide-specific copy in a theme.
-4. Check contrast, focus visibility, diagrams, tables, code blocks, print output, and narrow screens.
-5. Verify explicit `?theme=<id>`, saved choice, automatic OS preference, and fallback behavior.
-6. Run `npm test` and `npm run validate`.
+1. Add or update the theme under `themes` in `presentations/<slug>/deck.config.js`.
+2. Set `theme` to the selected stable lowercase theme ID.
+3. Define a human-readable label, `colorScheme`, and semantic CSS custom properties.
+4. Keep theme tokens global and semantic; do not encode slide-specific copy in a theme.
+5. Run `npm run bundle -- <slug>` to refresh the inline definition in the self-contained HTML.
+6. Check contrast, focus visibility, diagrams, tables, code blocks, print output, and narrow screens.
+7. Run `npm test` and `npm run validate`.
 
 ## Constraints
 
+- Do not add a runtime theme selector.
 - Do not interpolate untrusted remote values into theme configuration.
 - Custom property names must start with `--`.
-- A missing or invalid theme must fall back without breaking slide navigation.
-- Deck authors may define any number of themes; the selector is hidden when only one is configured.
+- A missing or invalid selected theme must fall back without breaking navigation.
+- The bundled `index.html` must remain self-contained and shareable by itself.

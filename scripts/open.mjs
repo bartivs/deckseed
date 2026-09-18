@@ -40,7 +40,7 @@ async function resolvePresentation(value) {
       if (info.isDirectory()) {
         const index = path.join(absolute, "index.html");
         await access(index);
-        return path.relative(root, `${absolute}${path.sep}`).split(path.sep).map(encodeURIComponent).join("/");
+        return `${path.relative(root, absolute).split(path.sep).map(encodeURIComponent).join("/")}/`;
       }
       if (info.isFile() && absolute.endsWith(".html")) {
         return path.relative(root, absolute).split(path.sep).map(encodeURIComponent).join("/");

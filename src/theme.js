@@ -1,27 +1,8 @@
-export function selectTheme({
-  available,
-  query,
-  stored,
-  prefersDark = false,
-  defaultTheme = "auto",
-  fallbackTheme,
-  themes = {},
-}) {
+export function selectTheme({ available, configuredTheme, fallbackTheme }) {
   if (!Array.isArray(available) || available.length === 0) {
     throw new Error("At least one presentation theme must be configured.");
   }
-
-  const directCandidates = [query, stored];
-  for (const candidate of directCandidates) {
-    if (candidate && available.includes(candidate)) return candidate;
-  }
-
-  if (defaultTheme === "auto") {
-    const preferredScheme = prefersDark ? "dark" : "light";
-    const systemMatch = available.find((theme) => themes[theme]?.colorScheme === preferredScheme);
-    if (systemMatch) return systemMatch;
-  } else if (available.includes(defaultTheme)) return defaultTheme;
-
+  if (configuredTheme && available.includes(configuredTheme)) return configuredTheme;
   if (fallbackTheme && available.includes(fallbackTheme)) return fallbackTheme;
   return available[0];
 }

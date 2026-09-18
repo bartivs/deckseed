@@ -3,13 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "A dependency-free HTML presentation harness with configurable localization.",
+  "description": "A dependency-free harness for self-contained HTML presentations with configurable localization.",
   "keywords": ["presentation", "slides", "i18n", "agent-skill"],
   "pi": {
     "skills": ["./.agents/skills"]
   },
   "scripts": {
     "new": "node scripts/new-deck.mjs",
+    "bundle": "node scripts/bundle-deck.mjs",
     "serve": "node scripts/serve.mjs",
     "open": "node scripts/open.mjs",
     "validate": "node scripts/validate.mjs",

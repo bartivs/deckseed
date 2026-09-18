@@ -9,14 +9,11 @@ const fallbackLanguage = config.fallbackLanguage ?? languages[0];
 const themes = config.themes ?? { default: { label: "Default", colorScheme: "normal", variables: {} } };
 const themeIds = Object.keys(themes);
 const languageStorageKey = config.languageStorageKey ?? config.storageKey ?? `presentation-language:${config.id ?? "default"}`;
-const themeStorageKey = config.themeStorageKey ?? `presentation-theme:${config.id ?? "default"}`;
 const slides = [...document.querySelectorAll(".slide")];
 const counter = document.querySelector("[data-slide-counter]");
 const progress = document.querySelector("[data-progress]");
 const languageSelect = document.querySelector("[data-language-select]");
 const languageControl = document.querySelector("[data-language-control]");
-const themeSelect = document.querySelector("[data-theme-select]");
-const themeControl = document.querySelector("[data-theme-control]");
 let index = Math.max(0, Math.min(slides.length - 1, Number(location.hash.slice(1)) - 1 || 0));
 let touchStartX;
 let currentLanguage;
@@ -84,12 +81,10 @@ function applyTheme(themeId) {
   document.documentElement.classList.add(`theme-${themeId}`);
   document.documentElement.style.colorScheme = theme.colorScheme ?? "normal";
   currentTheme = themeId;
-  if (themeSelect) themeSelect.value = themeId;
-  writeStorage(themeStorageKey, themeId);
   dispatchEvent(new CustomEvent("presentation:themechange", { detail: { theme: themeId } }));
 }
 
-function configureSelectors() {
+function configureLanguageSelector() {
   if (languageSelect) {
     languageSelect.replaceChildren();
     for (const [code, metadata] of Object.entries(config.languages)) {
@@ -102,20 +97,6 @@ function configureSelectors() {
     languageSelect.addEventListener("change", () => {
       setQueryOption("lang", languageSelect.value);
       applyTranslations(languageSelect.value);
-    });
-  }
-  if (themeSelect) {
-    themeSelect.replaceChildren();
-    for (const [id, metadata] of Object.entries(themes)) {
-      const option = document.createElement("option");
-      option.value = id;
-      option.textContent = metadata.label ?? id;
-      themeSelect.append(option);
-    }
-    if (themeControl) themeControl.hidden = themeIds.length < 2;
-    themeSelect.addEventListener("change", () => {
-      setQueryOption("theme", themeSelect.value);
-      applyTheme(themeSelect.value);
     });
   }
 }
@@ -135,8 +116,11 @@ function render(nextIndex, updateHash = true) {
 }
 
 function move(delta) { render(index + delta); }
-document.querySelector("[data-previous]")?.addEventListener("click", () => move(-1));
-document.querySelector("[data-next]")?.addEventListener("click", () => move(1));
+globalThis.presentationMove = move;
+document.querySelector(".deck")?.addEventListener("click", (event) => {
+  if (event.defaultPrevented || event.target.closest("a, button, select, label")) return;
+  move(event.clientX < innerWidth * 0.25 ? -1 : 1);
+});
 document.addEventListener("keydown", (event) => {
   if (["ArrowRight", "PageDown", " "].includes(event.key)) { event.preventDefault(); move(1); }
   if (["ArrowLeft", "PageUp"].includes(event.key)) { event.preventDefault(); move(-1); }
@@ -158,15 +142,11 @@ document.addEventListener("touchend", (event) => {
 }, { passive: true });
 
 if (slides.length === 0) throw new Error("The presentation must contain at least one .slide element.");
-configureSelectors();
+configureLanguageSelector();
 currentTheme = selectTheme({
   available: themeIds,
-  query: queryOption("theme"),
-  stored: readStorage(themeStorageKey),
-  prefersDark: globalThis.matchMedia?.("(prefers-color-scheme: dark)").matches ?? false,
-  defaultTheme: config.defaultTheme ?? "auto",
+  configuredTheme: config.theme,
   fallbackTheme: config.fallbackTheme ?? themeIds[0],
-  themes,
 });
 applyTheme(currentTheme);
 currentLanguage = selectLanguage({

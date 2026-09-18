@@ -6,20 +6,15 @@ const themes = {
   midnight: { label: "Midnight", colorScheme: "dark", variables: { "--harness-bg": "#000" } },
   paper: { label: "Paper", colorScheme: "light", variables: { "--harness-bg": "#fff" } },
 };
-const base = { available: Object.keys(themes), themes, defaultTheme: "auto", fallbackTheme: "midnight" };
+const available = Object.keys(themes);
 
-test("theme selection respects query and stored preferences", () => {
-  assert.equal(selectTheme({ ...base, query: "paper", stored: "midnight" }), "paper");
-  assert.equal(selectTheme({ ...base, stored: "paper" }), "paper");
-});
-
-test("automatic theme follows the OS color preference", () => {
-  assert.equal(selectTheme({ ...base, prefersDark: true }), "midnight");
-  assert.equal(selectTheme({ ...base, prefersDark: false }), "paper");
+test("theme selection uses the presentation definition", () => {
+  assert.equal(selectTheme({ available, configuredTheme: "paper", fallbackTheme: "midnight" }), "paper");
 });
 
 test("theme selection falls back safely", () => {
-  assert.equal(selectTheme({ ...base, query: "unknown", defaultTheme: "unknown" }), "midnight");
+  assert.equal(selectTheme({ available, configuredTheme: "unknown", fallbackTheme: "midnight" }), "midnight");
+  assert.equal(selectTheme({ available, configuredTheme: "unknown", fallbackTheme: "unknown" }), "midnight");
   assert.throws(() => selectTheme({ available: [] }), /At least one/);
 });
 

@@ -48,9 +48,10 @@ Keep product names, API identifiers, enum values, code, URLs, commit SHAs, event
    - browser-language selection and local-storage precedence still work;
    - accessible labels change with the language;
    - RTL languages set `direction: "rtl"` and render correctly.
-8. Run:
+8. Refresh the self-contained HTML and run verification:
 
    ```bash
+   npm run bundle -- <slug>
    npm test
    npm run validate
    git diff --check
@@ -68,4 +69,5 @@ Treat any of these as defects:
 - translated trusted markup breaks the slide structure;
 - URLs, code, API identifiers, enum values, or product names are corrupted;
 - accessible names remain in the fallback language;
+- the inline configuration is stale or the HTML depends on local CSS/JavaScript files;
 - presentation content is staged or committed. Presentation files under `presentations/` must remain ignored.

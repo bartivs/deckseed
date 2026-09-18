@@ -23,7 +23,8 @@ compatibility: Node.js 20 or newer; xdg-open, open, or a Windows desktop browser
    npm run open
    ```
 
-4. Report the local URL so the user can reopen or share it on the same machine.
+4. Report the local URL so the user can reopen it on the same machine. Directory deck URLs must end with `/` so relative navigation remains well-defined.
+5. Remind the user that the generated `index.html` is self-contained and can be copied or opened directly when they need to share it.
 
 ## Headless environments
 
