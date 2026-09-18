@@ -62,6 +62,7 @@ p, li { font-size: clamp(0.9rem, 1.3vw, 1.25rem); line-height: 1.5; }
   background: color-mix(in srgb, var(--harness-panel) 90%, transparent);
   backdrop-filter: blur(12px);
 }
+.preference-control[hidden] { display: none; }
 .preference-control label { color: var(--harness-muted); font-size: 0.72rem; }
 .preference-control select {
   border: 0;
