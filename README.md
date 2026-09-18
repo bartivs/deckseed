@@ -4,6 +4,8 @@ A dependency-free HTML presentation harness with keyboard/touch navigation, prin
 
 ## Quick start
 
+First iterate on the audience, narrative, slide outline, and visual direction in chat. Generate files only after the user explicitly approves that proposal.
+
 ```bash
 npm run new -- architecture-review \
   --title "Architecture Review" \
@@ -14,6 +16,8 @@ npm run new -- architecture-review \
 
 npm run serve
 ```
+
+The generator creates `content.md` before `index.html` and `deck.config.js`. Replace its starter copy with the approved brief and slide-by-slide content, then implement the HTML from that source artifact. Keep all three files aligned.
 
 Open `http://127.0.0.1:4173/presentations/architecture-review/`.
 
@@ -128,8 +132,8 @@ scripts/                     Generator, server, and validation
 .agents/skills/              Canonical Agent Skills workflows
 .claude/skills -> …           Claude Code discovery alias
 .opencode/skills -> …         OpenCode discovery alias
-templates/                   Tracked deck template
-presentations/               Local ignored presentation content
+templates/                   Tracked content and HTML templates
+presentations/               Local ignored content.md and deck files
 test/                        Harness tests
 ```
 
@@ -137,7 +141,7 @@ test/                        Harness tests
 
 The repository separates work into five shared Agent Skills:
 
-- `scaffold-presentation` — generate a new ignored deck
+- `scaffold-presentation` — get content approval, create `content.md`, then generate a new ignored deck
 - `open-presentation` — start the server and launch a local deck
 - `localize-presentation` — configure languages and translation keys
 - `theme-presentation` — define and check user-selectable themes

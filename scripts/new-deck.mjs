@@ -44,14 +44,18 @@ if (defaultTheme !== "auto" && !themeIds.includes(defaultTheme)) {
   process.exit(1);
 }
 const output = path.join(root, "presentations", slug);
+const contentPath = path.join(output, "content.md");
 const indexPath = path.join(output, "index.html");
+const configPath = path.join(output, "deck.config.js");
 
 if (!force) {
-  try {
-    await access(indexPath);
-    console.error(`Presentation already exists: ${path.relative(root, output)} (use --force to replace it)`);
-    process.exit(1);
-  } catch { /* Expected for a new deck. */ }
+  for (const artifactPath of [contentPath, indexPath, configPath]) {
+    try {
+      await access(artifactPath);
+      console.error(`Presentation already exists: ${path.relative(root, output)} (use --force to replace it)`);
+      process.exit(1);
+    } catch { /* Expected for a new deck. */ }
+  }
 }
 
 const languageLabels = { en: "English", es: "Español", fr: "Français", de: "Deutsch", pt: "Português", it: "Italiano", ca: "Català" };
@@ -117,11 +121,14 @@ const config = {
 };
 
 const escapeHtml = (value) => value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
-const template = await readFile(path.join(root, "templates", "deck.html"), "utf8");
+const contentTemplate = await readFile(path.join(root, "templates", "content.md"), "utf8");
+const htmlTemplate = await readFile(path.join(root, "templates", "deck.html"), "utf8");
 await mkdir(output, { recursive: true });
-await writeFile(indexPath, template.replaceAll("{{TITLE}}", escapeHtml(title)));
-await writeFile(path.join(output, "deck.config.js"), `window.PRESENTATION_CONFIG = ${JSON.stringify(config, null, 2)};\n`);
+await writeFile(contentPath, contentTemplate.replaceAll("{{TITLE}}", title));
+await writeFile(indexPath, htmlTemplate.replaceAll("{{TITLE}}", escapeHtml(title)));
+await writeFile(configPath, `window.PRESENTATION_CONFIG = ${JSON.stringify(config, null, 2)};\n`);
 console.log(`Created ${path.relative(root, output)}`);
+console.log("Content artifact: content.md (created before the HTML implementation)");
 console.log(`Languages: ${languageCodes.join(", ")} (default: ${defaultLanguage})`);
 console.log(`Themes: ${themeIds.join(", ")} (default: ${defaultTheme})`);
 console.log("Presentation files are ignored by Git by design.");
