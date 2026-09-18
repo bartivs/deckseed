@@ -106,6 +106,7 @@ The selector is hidden automatically when a deck has only one theme.
 ```bash
 npm run new -- <slug> [options]  # Generate an ignored local deck
 npm run serve                    # Serve harness and local decks on port 4173
+npm run open -- <presentation>   # Start the server and open a deck
 npm run validate                 # Validate templates and local decks
 npm test                         # Run language-selection tests
 ```
@@ -134,9 +135,10 @@ test/                        Harness tests
 
 ## Multi-agent skills
 
-The repository separates work into four shared Agent Skills:
+The repository separates work into five shared Agent Skills:
 
 - `scaffold-presentation` — generate a new ignored deck
+- `open-presentation` — start the server and launch a local deck
 - `localize-presentation` — configure languages and translation keys
 - `theme-presentation` — define and check user-selectable themes
 - `validate-presentation` — test rendering, localization, themes, and privacy boundaries
@@ -149,6 +151,8 @@ The canonical skills live in `.agents/skills/`:
 - **Claude Code** uses the `.claude/skills` alias and reads `CLAUDE.md`, which points to the shared `AGENTS.md` instructions.
 
 All agents use the same files, so workflows cannot drift between agent-specific copies.
+
+To open a deck without launching a desktop browser, use `npm run open -- <presentation> --no-browser`. If only one deck exists, `<presentation>` may be omitted.
 
 ## Keyboard controls
 

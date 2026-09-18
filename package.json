@@ -11,6 +11,7 @@
   "scripts": {
     "new": "node scripts/new-deck.mjs",
     "serve": "node scripts/serve.mjs",
+    "open": "node scripts/open.mjs",
     "validate": "node scripts/validate.mjs",
     "test": "node --test"
   },

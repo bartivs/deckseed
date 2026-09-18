@@ -11,6 +11,7 @@
 Use the shared Agent Skills under `.agents/skills/`:
 
 - `scaffold-presentation` to create a deck.
+- `open-presentation` to launch a local deck in the browser.
 - `localize-presentation` to configure languages and translations.
 - `theme-presentation` to define and test user-selectable themes.
 - `validate-presentation` before completion.
