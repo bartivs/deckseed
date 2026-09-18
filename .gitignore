@@ -1,0 +1,9 @@
+# Presentation content is intentionally local and must never be committed.
+presentations/*
+!presentations/.gitkeep
+
+# Local/editor output
+.DS_Store
+*.log
+node_modules/
+coverage/

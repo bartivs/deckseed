@@ -1,0 +1,21 @@
+{
+  "name": "presentation-harness",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "A dependency-free HTML presentation harness with configurable localization.",
+  "keywords": ["presentation", "slides", "i18n", "agent-skill"],
+  "pi": {
+    "skills": ["./.agents/skills"]
+  },
+  "scripts": {
+    "new": "node scripts/new-deck.mjs",
+    "serve": "node scripts/serve.mjs",
+    "validate": "node scripts/validate.mjs",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "MIT"
+}
