@@ -33,6 +33,12 @@ Use the shared Agent Skills under `.agents/skills/`:
 - Generated presentation HTML must inline its CSS, configuration, and runtime. Do not add viewer-facing theme selectors.
 - Keep the harness dependency-free unless a requirement cannot reasonably be implemented with browser and Node.js standard APIs.
 
+## Preview behavior
+
+- Do not start the local presentation server unless the user explicitly asks for it.
+- Build and validate the self-contained static `presentations/<slug>/index.html`, then point the user to that file.
+- Ask before opening the static file in the user's default browser.
+
 ## Verification
 
 Run:
