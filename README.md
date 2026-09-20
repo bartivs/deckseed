@@ -1,6 +1,6 @@
 # Presentation Harness
 
-A dependency-free HTML presentation harness with keyboard/touch navigation, print support, configurable localization, and presentation-defined themes. Generated decks inline their CSS, configuration, and runtime into one self-contained `index.html` that can be shared or opened directly. Shared Agent Skills make the same workflows available to Pi, OpenCode, Claude Code, and Codex. The harness is tracked; presentation content stays local and is ignored by Git.
+A dependency-free HTML presentation harness with keyboard/touch navigation, print support, configurable localization, and nine presentation-defined themes. Generated decks inline their CSS, configuration, and runtime into one self-contained `index.html` that can be shared or opened directly. Shared Agent Skills make the same workflows available to Pi, OpenCode, Claude Code, and Codex. The harness is tracked; presentation content stays local and is ignored by Git.
 
 ## Quick start
 
@@ -99,7 +99,31 @@ Theme resolution is deterministic:
 2. Configured `fallbackTheme`
 3. First configured theme
 
-The generator offers `midnight`, `paper`, and `ember` starting points. After changing the definition, run `npm run bundle -- <slug>` to refresh the inline configuration in `index.html`.
+The generator offers nine original presets. They are informed by recurring families in widely used presentation systems rather than copied from them: Reveal.js ships dark, light, beige/serif, solarized, sky, and vivid dark themes; Marp describes its Uncover theme as simple, minimal, and modern. The result is a practical spread across minimal, professional, editorial, high-impact, and organic styles.
+
+Sources: [Reveal.js themes](https://revealjs.com/themes/), [Marp built-in themes](https://github.com/marp-team/marp-core/blob/main/themes/README.md), and [SlidesCarnival's popular templates](https://www.slidescarnival.com/category/free-templates/popular-templates). These sources show common theme families, not an objective popularity ranking.
+
+### Theme gallery
+
+| Theme | Preview | Designed for |
+| --- | --- | --- |
+| `midnight` | <img src="docs/theme-previews/midnight.svg" alt="Midnight theme demo" width="240"> | Technical talks, product launches, data-heavy stories |
+| `paper` | <img src="docs/theme-previews/paper.svg" alt="Paper theme demo" width="240"> | Editorial narratives, reports, thoughtful long-form decks |
+| `ember` | <img src="docs/theme-previews/ember.svg" alt="Ember theme demo" width="240"> | Bold keynotes, launches, energetic pitches |
+| `atlas` | <img src="docs/theme-previews/atlas.svg" alt="Atlas theme demo" width="240"> | Executive reviews, strategy, premium proposals |
+| `solar` | <img src="docs/theme-previews/solar.svg" alt="Solar theme demo" width="240"> | Workshops, documentation, warm technical decks |
+| `ocean` | <img src="docs/theme-previews/ocean.svg" alt="Ocean theme demo" width="240"> | Education, healthcare, calm explanatory stories |
+| `plum` | <img src="docs/theme-previews/plum.svg" alt="Plum theme demo" width="240"> | Creative technology, demos, modern night-mode decks |
+| `mono` | <img src="docs/theme-previews/mono.svg" alt="Mono theme demo" width="240"> | Minimal portfolios, architecture, sharp product narratives |
+| `meadow` | <img src="docs/theme-previews/meadow.svg" alt="Meadow theme demo" width="240"> | Sustainability, people, lifestyle, organic brands |
+
+Create a deck with a preset:
+
+```bash
+npm run new -- quarterly-strategy --theme atlas
+```
+
+A generated deck embeds only its selected preset. You can then customize the semantic tokens in its local `deck.config.js`. After changing that definition, run `npm run bundle -- <slug>` to refresh the inline configuration in `index.html`. To rebuild the tracked gallery after changing the preset library, run `npm run themes:previews`.
 
 ## Commands
 
@@ -108,8 +132,9 @@ npm run new -- <slug> [options]  # Generate an ignored local deck
 npm run bundle -- <slug>         # Refresh inline CSS, config, and runtime
 npm run serve                    # Serve harness and local decks on port 4173
 npm run open -- <presentation>   # Start the server and open a deck
+npm run themes:previews          # Regenerate the README theme demos
 npm run validate                 # Validate templates and local decks
-npm test                         # Run language-selection tests
+npm test                         # Run the test suite
 ```
 
 Generator options:
@@ -117,7 +142,7 @@ Generator options:
 - `--title "Title"`
 - `--languages en,es,fr`
 - `--default-language auto|<code>`
-- `--theme midnight|paper|ember`
+- `--theme midnight|paper|ember|atlas|solar|ocean|plum|mono|meadow`
 - `--force` to replace an existing generated deck
 
 ## Repository structure

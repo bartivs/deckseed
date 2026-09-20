@@ -3,6 +3,7 @@ import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
 import { bundleDeckHtml } from "./bundle-lib.mjs";
+import { themePresets } from "../src/theme-presets.js";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const args = process.argv.slice(2);
@@ -30,13 +31,8 @@ if (defaultLanguage !== "auto" && !languageCodes.includes(defaultLanguage)) {
   console.error("--default-language must be auto or one of the configured languages");
   process.exit(1);
 }
-const themeLibrary = {
-  midnight: { label: "Midnight", colorScheme: "dark", variables: { "--harness-bg": "#07111f", "--harness-panel": "#12243a", "--harness-text": "#f2f7fb", "--harness-muted": "#9db1c7", "--harness-accent": "#56d7e8", "--harness-border": "rgba(157, 177, 199, 0.25)" } },
-  paper: { label: "Paper", colorScheme: "light", variables: { "--harness-bg": "#f5f1e8", "--harness-panel": "#ffffff", "--harness-text": "#17202a", "--harness-muted": "#5d6975", "--harness-accent": "#087f91", "--harness-border": "rgba(23, 32, 42, 0.18)" } },
-  ember: { label: "Ember", colorScheme: "dark", variables: { "--harness-bg": "#180d0a", "--harness-panel": "#2a1711", "--harness-text": "#fff6ed", "--harness-muted": "#d0a68f", "--harness-accent": "#ff8a3d", "--harness-border": "rgba(255, 176, 122, 0.25)" } }
-};
-if (!(themeId in themeLibrary)) {
-  console.error(`--theme must be one of: ${Object.keys(themeLibrary).join(", ")}`);
+if (!(themeId in themePresets)) {
+  console.error(`--theme must be one of: ${Object.keys(themePresets).join(", ")}`);
   process.exit(1);
 }
 const output = path.join(root, "presentations", slug);
@@ -101,7 +97,7 @@ const spanish = {
 };
 const translations = Object.fromEntries(languageCodes.map((code) => [code, code === "es" ? spanish : { ...english }]));
 const languages = Object.fromEntries(languageCodes.map((code) => [code, { label: languageLabels[code] ?? code, direction: ["ar", "he", "fa", "ur"].includes(code.split("-")[0]) ? "rtl" : "ltr" }]));
-const themes = { [themeId]: themeLibrary[themeId] };
+const themes = { [themeId]: themePresets[themeId] };
 const config = {
   id: slug,
   titleKey: "slides.title.documentTitle",
