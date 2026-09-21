@@ -1,10 +1,24 @@
 # Presentation Harness
 
-A token-efficient presentation pipeline built on Pandoc's Reveal.js writer. Authors maintain one approved `content.md` source and one `theme.css`; the build produces a self-contained `index.html` with navigation, touch controls, fullscreen, progress, print support, and embedded assets. Presentation content stays local and ignored by Git.
+A token-efficient, agent-first presentation pipeline built on Pandoc's Reveal.js writer. Authors maintain one approved `content.md` source and one `theme.css`; the build produces a self-contained `index.html` with navigation, touch controls, fullscreen, progress, print support, and embedded assets. Presentation content stays local and ignored by Git.
+
+## Differentiator: optimize authoring tokens, not generated output
+
+Most presentation generators optimize the final artifact. This harness also optimizes the **AI production loop**: agents read and edit only compact Markdown and theme CSS, while Pandoc owns the large runtime HTML.
+
+| Conventional agent-authored deck | This harness |
+| --- | --- |
+| Copy is repeated across briefs, HTML, and configuration | Approved copy and slide implementation share one `content.md` |
+| The model edits verbose generated markup | Generated `index.html` is disposable and never model-authored |
+| Runtime translation dictionaries expand context | Each localized deck has a focused Markdown source |
+| Source/output drift is found manually | A SHA-256 source stamp makes stale output a validation error |
+| Sharing may require local assets or dependencies | Pandoc embeds Reveal.js, CSS, and media into one offline HTML file |
+
+The generated HTML may be large because it contains the complete runtime. The efficiency gain is in the material humans and agents maintain: a small, stable source surface that reduces context usage, duplicated edits, and opportunities for drift.
 
 ## Why Pandoc
 
-Pandoc keeps the model-facing source compact: slide copy, document metadata, and layout annotations live in Markdown instead of duplicated HTML and JavaScript translation dictionaries. Generated HTML is disposable and must never be hand-edited.
+Pandoc keeps the model-facing source compact: slide copy, document metadata, and layout annotations live in Markdown instead of duplicated HTML and JavaScript configuration. Generated HTML is disposable and must never be hand-edited.
 
 ```text
 Chat approval → content.md + theme.css → Pandoc/Reveal.js → index.html → validation
