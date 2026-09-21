@@ -1,56 +1,48 @@
 ---
 name: validate-presentation
-description: Validates and previews presentations created with this harness. Use before presenting, sharing the standalone HTML, exporting to PDF, publishing harness changes, or checking navigation, localization, responsive rendering, and Git privacy boundaries.
+description: Builds and validates Pandoc presentations, self-contained Reveal.js output, responsive rendering, source freshness, and Git privacy boundaries.
 license: MIT
-compatibility: Node.js 20 or newer; a browser is recommended for visual checks
+compatibility: Node.js 20 or newer; Pandoc 3 or newer; a browser is recommended for visual checks
 ---
 
 # Validate a presentation
 
 ## Automated checks
 
-Refresh the self-contained bundle after editing deck configuration or reusable harness files:
+Build after editing `content.md`, `theme.css`, or shared CSS:
 
 ```bash
-npm run bundle -- <slug>
+npm run build -- <slug>
 npm test
 npm run validate
+git diff --check
+git status --short --ignored
 ```
 
-Then verify the privacy boundary:
+`npm run validate` checks:
 
-```bash
-git status --short
-git check-ignore -v presentations/<slug>/index.html
-```
+- required `content.md`, `theme.css`, and generated `index.html` files;
+- required approval and document metadata;
+- a valid Reveal.js document;
+- no external script or stylesheet tags;
+- no remote theme resources;
+- the embedded source hash, which detects stale generated HTML;
+- Agent Skill frontmatter.
 
-The presentation must be ignored. Never stage it.
-
-`npm run validate` must reject:
-
-- stale inline configuration;
-- external script or stylesheet dependencies;
-- a runtime theme selector;
-- missing language, translation, or theme definitions.
+The presentation must appear only as ignored (`!!`). Never stage it.
 
 ## Browser checks
 
-1. Start the server with `npm run serve`, or open the self-contained `index.html` directly with `file://`.
-2. Open `http://127.0.0.1:4173/presentations/<slug>/` when using the server.
-3. Check previous/next buttons, slide-background click, keyboard, touch, Home/End, fullscreen, and print controls.
-4. Check every configured language through the selector and `?lang=<code>`.
-5. Confirm the browser language and stored language are selected when no URL choice exists.
-6. Confirm the theme matches the fixed `theme` value in the presentation definition and that no theme selector is visible.
-7. Check 1440×900 and a narrow mobile viewport.
-8. Open or copy `index.html` outside the repository and confirm navigation and styling still work without network or local-file requests.
-9. Print to PDF and verify slide boundaries.
+1. Open the self-contained `index.html` directly, or start the server only when the user asks.
+2. Check arrow, Space, Home/End, overview, fullscreen, touch, and print behavior.
+3. Check every slide at 1440×900 and at a narrow viewport; Reveal.js scales the authored canvas.
+4. Check tables, code, diagrams, contrast, focus visibility, and dense-slide overflow.
+5. Open or copy `index.html` outside the repository and verify it works without network access.
+6. Print to PDF and verify slide boundaries when PDF is a deliverable.
 
 ## Completion criteria
 
-- No missing translation keys are visible.
-- Every slide fits or scrolls intentionally.
-- Accessible names change with the selected language.
-- Language URL overrides, persisted choices, automatic defaults, and fallbacks behave in the documented order.
-- The author-selected theme is applied without viewer-facing theme controls.
-- `index.html` is fully self-contained and shareable by itself.
-- No presentation content appears in the staged diff.
+- `content.md` is the approved and complete source.
+- `theme.css` contains no remote dependencies.
+- `index.html` is fresh, self-contained, and never hand-edited.
+- No presentation path is staged or tracked.

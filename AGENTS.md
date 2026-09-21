@@ -10,28 +10,38 @@
 
 - Always develop and iterate on presentation ideas, audience, narrative, and slide outline with the user in chat first.
 - Do not create or change presentation content until the user explicitly approves the proposed direction and outline.
-- After approval, record the approved brief and slide-by-slide copy in `presentations/<slug>/content.md` before implementing it in `index.html` and `deck.config.js`.
-- Run `npm run bundle -- <slug>` after changing deck configuration or shared runtime files; `index.html` must remain self-contained and shareable by itself.
-- Treat `content.md` as the source artifact for the HTML presentation. Keep the implementation aligned with it, and return to chat for approval before introducing material changes to the approved content or structure.
+- After approval, record the brief, metadata, and slide-by-slide copy in `presentations/<slug>/content.md`.
+- Treat `content.md` as both the approved source artifact and the Pandoc implementation source. Do not hand-edit generated `index.html`.
+- Return to chat for approval before introducing material changes to approved content or structure.
 
 ## Workflow
 
 Use the shared Agent Skills under `.agents/skills/`:
 
 - `scaffold-presentation` to create a deck.
-- `open-presentation` to launch a local deck in the browser.
-- `localize-presentation` to configure languages and translations.
-- `theme-presentation` to define and test the fixed presentation theme.
+- `open-presentation` to launch a local deck.
+- `localize-presentation` to create or update a localized source.
+- `theme-presentation` to define and test the fixed theme.
 - `validate-presentation` before completion.
 
 ## Architecture
 
-- Reusable browser behavior belongs in `src/`.
-- Generator/server/validation logic belongs in `scripts/`.
+- Pandoc Markdown and deck metadata live in `presentations/<slug>/content.md`.
+- Deck-specific theme overrides live in `presentations/<slug>/theme.css`.
+- Generated `presentations/<slug>/index.html` is disposable build output.
+- Shared Reveal.js styling belongs in `src/pandoc.css`.
+- Generator, build, server, and validation logic belongs in `scripts/`.
 - Tracked scaffolding belongs in `templates/`.
-- Deck-specific copy, translations, images, `content.md`, and configuration belong in ignored `presentations/`.
-- Generated presentation HTML must inline its CSS, configuration, and runtime. Do not add viewer-facing theme selectors.
-- Keep the harness dependency-free unless a requirement cannot reasonably be implemented with browser and Node.js standard APIs.
+- The build must use Pandoc's Reveal.js writer with embedded resources. Generated HTML must have no external script or stylesheet tags.
+- Keep the npm package dependency-free; Pandoc is an external CLI prerequisite.
+
+## Build behavior
+
+- Run `npm run build -- <slug>` after changing `content.md`, `theme.css`, or shared CSS.
+- `npm run bundle -- <slug>` is a compatibility alias for the same build.
+- The builder stamps a SHA-256 of all source inputs into `index.html`; validation rejects stale output.
+- One source deck has one language. Localize by producing a separate approved source/deck rather than runtime translation dictionaries.
+- The selected theme belongs to the deck definition. Do not add viewer-facing language or theme selectors.
 
 ## Preview behavior
 

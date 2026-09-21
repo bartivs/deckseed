@@ -1,54 +1,40 @@
 ---
 name: localize-presentation
-description: Adds, removes, or updates configurable presentation languages and translations. Use for language selectors, Spanish or other translations, browser-language defaults, fallback behavior, RTL support, or translation-key audits.
+description: Creates or updates a separate localized Pandoc source deck without runtime translation dictionaries or language selectors.
 license: MIT
-compatibility: Node.js 20 or newer
+compatibility: Node.js 20 or newer; Pandoc 3 or newer
 ---
 
 # Localize a presentation
 
-## Configuration contract
-
-Each generated deck defines `window.PRESENTATION_CONFIG` in `deck.config.js`:
-
-```js
-window.PRESENTATION_CONFIG = {
-  id: "deck-id",
-  fallbackLanguage: "en",
-  defaultLanguage: "auto",
-  languages: {
-    en: { label: "English", direction: "ltr" },
-    es: { label: "Español", direction: "ltr" }
-  },
-  translations: {
-    en: { "slides.title.heading": "Title" },
-    es: { "slides.title.heading": "Título" }
-  }
-};
-```
-
-## Selection precedence
-
-Do not change this order without an explicit compatibility decision:
-
-1. `?lang=<code>` URL override
-2. Previously selected language in local storage
-3. `navigator.languages` when `defaultLanguage` is `auto`
-4. Configured `defaultLanguage`
-5. `fallbackLanguage`
-6. First configured language
+The Pandoc pipeline uses one language per source deck. Localization produces a separate ignored deck, normally with a language suffix such as `<slug>-es`, and a separate self-contained `index.html`.
 
 ## Procedure
 
-1. Add the language metadata under `languages`.
-2. Add the same translation keys under the new language.
-3. Mark text with `data-i18n`, trusted local markup with `data-i18n-html`, and accessible labels with `data-i18n-aria-label`.
-4. Keep product names, API identifiers, enum values, code, and URLs unchanged unless localization is intentional.
-5. Set `direction: "rtl"` for right-to-left languages.
-6. Run `npm run bundle -- <slug>` so the updated configuration is embedded in the self-contained `index.html`.
-7. Test explicit selection with `?lang=<code>` and automatic selection with the browser language.
-8. Run `npm run validate` and `npm test`.
+1. Confirm the target language and whether the approved structure must remain exact.
+2. Scaffold the localized deck using the same theme:
 
-## Failure behavior
+   ```bash
+   npm run new -- <slug>-es --title "<LOCALIZED TITLE>" --language es --theme atlas
+   ```
 
-A missing translation falls back to `fallbackLanguage`; if still missing, the translation key is shown. Treat visible keys as validation defects rather than silently inventing text. Treat a stale inline configuration or an external runtime dependency as a validation defect.
+3. Translate the complete source from the original `content.md` into the new `content.md`:
+   - preserve slide order and visual classes;
+   - translate headings, body text, labels, footers, notes, alt text, and metadata;
+   - set `lang` to the target BCP 47 language code;
+   - preserve facts, URLs, numbers, and approved caveats.
+4. Copy only necessary deck-specific CSS adjustments into the localized `theme.css`.
+5. Build and validate both decks:
+
+   ```bash
+   npm run build -- <slug>
+   npm run build -- <slug>-es
+   npm run validate
+   ```
+
+## Constraints
+
+- Do not add runtime language selectors or translation dictionaries.
+- Do not leave later slides in the source language.
+- Do not combine multiple languages in one `content.md` unless the approved presentation itself is bilingual.
+- Keep all localized presentation files ignored and untracked.

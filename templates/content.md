@@ -1,25 +1,50 @@
+---
+pagetitle: {{TITLE_YAML}}
+lang: {{LANGUAGE_YAML}}
+harness-theme: {{THEME_YAML}}
+audience: "Define the intended audience."
+goal: "Define what the audience should understand or do."
+core-message: "State the presentation's main idea in one sentence."
+controls: true
+progress: true
+slideNumber: true
+hash: true
+transition: fade
+width: 1600
+height: 900
+margin: 0.04
+---
+
+<div class="eyebrow">Presentation</div>
+
 # {{TITLE}}
 
-> Approved content source for the presentation HTML. Keep this file aligned with the implemented deck.
+<p class="lead">Replace this copy with the presentation's main idea.</p>
 
-## Presentation brief
+<footer class="slide-footer">Use the arrow keys or Space to navigate.</footer>
 
-- **Audience:** Define the intended audience.
-- **Goal:** Define what the audience should understand or do.
-- **Core message:** State the presentation's main idea in one sentence.
+---
 
-## Slide 1 — {{TITLE}}
+<div class="eyebrow">Example</div>
 
-- **Eyebrow:** Presentation
-- **Heading:** {{TITLE}}
-- **Lead:** Replace this copy with the presentation's main idea.
-- **Footer:** Use the arrow keys or Space to navigate.
+# Compose slides from reusable primitives
 
-## Slide 2 — Compose slides from reusable primitives
+<div class="card-grid">
+<div class="card">
+### Clear structure
 
-- **Eyebrow:** Example
-- **Heading:** Compose slides from reusable primitives
-- **Card 1:** Clear structure — Use semantic HTML and stable translation keys.
-- **Card 2:** Configurable languages — Add or remove languages in `deck.config.js`.
-- **Card 3:** Portable controls — Navigation, print, fullscreen and touch support are built in.
-- **Footer:** Presentation content stays local and untracked.
+Write slides in concise Pandoc Markdown.
+</div>
+<div class="card">
+### Presentation theme
+
+Customize the generated `theme.css` file.
+</div>
+<div class="card">
+### Portable output
+
+Navigation, print, fullscreen, and touch support come from Reveal.js.
+</div>
+</div>
+
+<footer class="slide-footer">`content.md` is the approved source; `index.html` is generated.</footer>

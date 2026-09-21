@@ -1,24 +1,129 @@
 # Presentation Harness
 
-A dependency-free HTML presentation harness with keyboard/touch navigation, print support, configurable localization, and nine presentation-defined themes. Generated decks inline their CSS, configuration, and runtime into one self-contained `index.html` that can be shared or opened directly. Shared Agent Skills make the same workflows available to Pi, OpenCode, Claude Code, and Codex. The harness is tracked; presentation content stays local and is ignored by Git.
+A token-efficient presentation pipeline built on Pandoc's Reveal.js writer. Authors maintain one approved `content.md` source and one `theme.css`; the build produces a self-contained `index.html` with navigation, touch controls, fullscreen, progress, print support, and embedded assets. Presentation content stays local and ignored by Git.
 
-## Quick start
+## Why Pandoc
 
-First iterate on the audience, narrative, slide outline, and visual direction in chat. Generate files only after the user explicitly approves that proposal.
+Pandoc keeps the model-facing source compact: slide copy, document metadata, and layout annotations live in Markdown instead of duplicated HTML and JavaScript translation dictionaries. Generated HTML is disposable and must never be hand-edited.
+
+```text
+Chat approval → content.md + theme.css → Pandoc/Reveal.js → index.html → validation
+```
+
+The build uses:
+
+- Pandoc's `revealjs` writer;
+- Reveal.js 5.2.1, pinned for reproducible output;
+- `--embed-resources` for a single shareable HTML file;
+- a SHA-256 source stamp so validation detects stale output.
+
+See the official [Pandoc slide-show documentation](https://pandoc.org/MANUAL.html#slide-shows) and [installation guide](https://pandoc.org/installing.html).
+
+## Prerequisites
+
+- Node.js 20 or newer
+- Pandoc 3 or newer available as `pandoc`
+- Network access during builds so Pandoc can fetch the pinned Reveal.js assets; generated decks work offline
+
+Check the installation:
+
+```bash
+node --version
+pandoc --version
+```
+
+Set `PANDOC_BIN=/path/to/pandoc` when the executable is not on `PATH`.
+
+## Production pipeline
+
+### 1. Approve the content
+
+First agree in chat on the audience, goal, core message, narrative, slide outline, language, and visual direction. Do not create presentation files before approval.
+
+### 2. Scaffold the source
 
 ```bash
 npm run new -- architecture-review \
   --title "Architecture Review" \
-  --languages en,es \
-  --default-language auto \
-  --theme midnight
-
-npm run serve
+  --language en \
+  --theme atlas
 ```
 
-The generator creates `content.md` before `index.html` and `deck.config.js`. Replace its starter copy with the approved brief and slide-by-slide content, then implement the HTML from that source artifact. Keep all three files aligned and run `npm run bundle -- architecture-review` after configuration changes.
+This creates only source files:
 
-Open `http://127.0.0.1:4173/presentations/architecture-review/`. The trailing slash is intentional. You can also copy or double-click `presentations/architecture-review/index.html`; it has no local CSS, configuration, or JavaScript dependencies.
+```text
+presentations/architecture-review/
+├── content.md   Approved metadata, copy, and Pandoc slide structure
+└── theme.css    Fixed presentation theme and local visual overrides
+```
+
+### 3. Implement in Markdown
+
+`content.md` is both the approval artifact and production source:
+
+```markdown
+---
+pagetitle: "Architecture Review"
+lang: "en"
+harness-theme: "atlas"
+audience: "Engineering and product leadership"
+goal: "Agree on the target architecture"
+core-message: "A smaller platform surface improves delivery speed"
+controls: true
+progress: true
+slideNumber: true
+transition: fade
+---
+
+<div class="eyebrow">Architecture</div>
+
+# Architecture Review
+
+A smaller platform surface improves delivery speed.
+
+---
+
+# Decision
+
+- Consolidate shared services
+- Publish stable contracts
+- Migrate incrementally
+```
+
+Horizontal rules separate slides. Use ordinary Markdown by default, fenced divs for layout groups, and trusted local HTML only when the design requires it.
+
+### 4. Build
+
+```bash
+npm run build -- architecture-review
+```
+
+The resulting `presentations/architecture-review/index.html` contains its Reveal.js runtime, shared CSS, deck CSS, and media inline. `npm run bundle -- <slug>` remains as a compatibility alias.
+
+### 5. Validate
+
+```bash
+npm test
+npm run validate
+git diff --check
+git status --short --ignored
+```
+
+Validation rejects missing sources, remote theme resources, external scripts or stylesheets, non-Reveal output, and stale generated HTML.
+
+### 6. Preview or share
+
+The normal deliverable is the generated static file:
+
+```text
+presentations/<slug>/index.html
+```
+
+It can be copied or opened directly without the repository. Start the local server only when an interactive browser preview is requested:
+
+```bash
+npm run open -- <slug>
+```
 
 ## Privacy boundary
 
@@ -29,81 +134,13 @@ presentations/*
 !presentations/.gitkeep
 ```
 
-Do not use `git add -f` for presentation files. They may contain internal plans, customer information, or unpublished research.
+Never use `git add -f` for a presentation. Decks may contain internal plans, customer information, or unpublished research.
 
-## Configurable languages
+## Themes
 
-Each deck has a local `deck.config.js`:
+Theme choice is part of the presentation source, not a viewer preference. The generator writes the selected preset to `theme.css`; there is no runtime theme selector.
 
-```js
-window.PRESENTATION_CONFIG = {
-  id: "architecture-review",
-  fallbackLanguage: "en",
-  defaultLanguage: "auto",
-  languages: {
-    en: { label: "English", direction: "ltr" },
-    es: { label: "Español", direction: "ltr" },
-    ar: { label: "العربية", direction: "rtl" }
-  },
-  translations: {
-    en: { "slides.title.heading": "Architecture Review" },
-    es: { "slides.title.heading": "Revisión de arquitectura" },
-    ar: { "slides.title.heading": "مراجعة البنية" }
-  },
-  theme: "midnight",
-  fallbackTheme: "midnight",
-  themes: {
-    midnight: {
-      label: "Midnight",
-      colorScheme: "dark",
-      variables: {
-        "--harness-bg": "#07111f",
-        "--harness-panel": "#12243a",
-        "--harness-text": "#f2f7fb",
-        "--harness-muted": "#9db1c7",
-        "--harness-accent": "#56d7e8"
-      }
-    }
-  }
-};
-```
-
-Language selection precedence:
-
-1. `?lang=<code>` URL parameter
-2. Saved user selection
-3. Browser languages when `defaultLanguage: "auto"`
-4. Configured default
-5. Fallback language
-6. First configured language
-
-The harness matches regional browser values such as `es-ES` to a configured base language such as `es`.
-
-### Translation attributes
-
-```html
-<h1 data-i18n="slides.title.heading">Fallback title</h1>
-<button data-i18n-aria-label="controls.next">→</button>
-<div data-i18n-html="slides.diagram.markup"></div>
-```
-
-`data-i18n-html` is intended only for trusted, repository-local translation content.
-
-## Presentation-defined theme
-
-Deck authors define themes in `deck.config.js` with semantic CSS custom properties and select one with `theme`. The choice is part of the presentation definition, not a viewer preference; there is no runtime theme selector, URL override, or stored theme choice.
-
-Theme resolution is deterministic:
-
-1. Configured `theme`
-2. Configured `fallbackTheme`
-3. First configured theme
-
-The generator offers nine original presets. They are informed by recurring families in widely used presentation systems rather than copied from them: Reveal.js ships dark, light, beige/serif, solarized, sky, and vivid dark themes; Marp describes its Uncover theme as simple, minimal, and modern. The result is a practical spread across minimal, professional, editorial, high-impact, and organic styles.
-
-Sources: [Reveal.js themes](https://revealjs.com/themes/), [Marp built-in themes](https://github.com/marp-team/marp-core/blob/main/themes/README.md), and [SlidesCarnival's popular templates](https://www.slidescarnival.com/category/free-templates/popular-templates). These sources show common theme families, not an objective popularity ranking.
-
-### Theme gallery
+The presets are original interpretations of common families in [Reveal.js themes](https://revealjs.com/themes/), [Marp's built-in themes](https://github.com/marp-team/marp-core/blob/main/themes/README.md), and popular minimalist/professional template categories. These references identify recurring styles, not an objective popularity ranking.
 
 | Theme | Preview | Designed for |
 | --- | --- | --- |
@@ -117,76 +154,52 @@ Sources: [Reveal.js themes](https://revealjs.com/themes/), [Marp built-in themes
 | `mono` | <img src="docs/theme-previews/mono.svg" alt="Mono theme demo" width="240"> | Minimal portfolios, architecture, sharp product narratives |
 | `meadow` | <img src="docs/theme-previews/meadow.svg" alt="Meadow theme demo" width="240"> | Sustainability, people, lifestyle, organic brands |
 
-Create a deck with a preset:
+Customize the ignored `theme.css` after scaffolding. Rebuild whenever it changes. Run `npm run themes:previews` after changing the tracked preset library.
 
-```bash
-npm run new -- quarterly-strategy --theme atlas
+## Localization
+
+One source deck has one language. A translated presentation gets a separate source and generated HTML, for example:
+
+```text
+presentations/quarterly-review/
+presentations/quarterly-review-es/
 ```
 
-A generated deck embeds only its selected preset. You can then customize the semantic tokens in its local `deck.config.js`. After changing that definition, run `npm run bundle -- <slug>` to refresh the inline configuration in `index.html`. To rebuild the tracked gallery after changing the preset library, run `npm run themes:previews`.
+This avoids large runtime translation dictionaries and keeps each Markdown source readable. Preserve slide structure, translate the complete deck, set the correct `lang`, and build both outputs independently.
 
 ## Commands
 
 ```bash
-npm run new -- <slug> [options]  # Generate an ignored local deck
-npm run bundle -- <slug>         # Refresh inline CSS, config, and runtime
-npm run serve                    # Serve harness and local decks on port 4173
-npm run open -- <presentation>   # Start the server and open a deck
-npm run themes:previews          # Regenerate the README theme demos
-npm run validate                 # Validate templates and local decks
+npm run new -- <slug> [options]  # Create ignored Pandoc sources
+npm run build -- <slug>          # Generate self-contained Reveal.js HTML
+npm run bundle -- <slug>         # Compatibility alias for build
+npm run serve                    # Serve local decks on port 4173
+npm run open -- <slug>           # Start the server and open a deck
+npm run themes:previews          # Regenerate README theme demos
+npm run validate                 # Validate source and generated output
 npm test                         # Run the test suite
 ```
 
 Generator options:
 
 - `--title "Title"`
-- `--languages en,es,fr`
-- `--default-language auto|<code>`
+- `--language en|es|pt-BR|...`
 - `--theme midnight|paper|ember|atlas|solar|ocean|plum|mono|meadow`
-- `--force` to replace an existing generated deck
+- `--force` to replace an existing local deck
 
 ## Repository structure
 
 ```text
-src/                         Reusable browser harness
-scripts/                     Generator, server, and validation
-.agents/skills/              Canonical Agent Skills workflows
-.claude/skills -> …           Claude Code discovery alias
-.opencode/skills -> …         OpenCode discovery alias
-templates/                   Tracked content and HTML templates
-presentations/               Local ignored content.md and deck files
-test/                        Harness tests
+src/pandoc.css                Shared Reveal.js presentation styling
+src/theme-presets.js          Generator theme presets
+scripts/build-deck.mjs        Pandoc build and self-contained-output checks
+scripts/new-deck.mjs          Source scaffolding
+scripts/validate.mjs          Freshness, portability, and privacy validation
+templates/content.md          Tracked Pandoc starter source
+presentations/                Ignored source decks and generated output
+docs/theme-previews/          README theme demos
+test/                         Harness tests
 ```
-
-## Multi-agent skills
-
-The repository separates work into five shared Agent Skills:
-
-- `scaffold-presentation` — get content approval, create `content.md`, then generate a new ignored deck
-- `open-presentation` — start the server and launch a local deck
-- `localize-presentation` — configure languages and translation keys
-- `theme-presentation` — define and check the fixed presentation theme
-- `validate-presentation` — test rendering, localization, themes, and privacy boundaries
-
-The canonical skills live in `.agents/skills/`:
-
-- **Pi** discovers `.agents/skills/` and the `pi.skills` package manifest.
-- **Codex** discovers `.agents/skills/` directly.
-- **OpenCode** discovers `.agents/skills/`; `.opencode/skills` is also provided as an alias.
-- **Claude Code** uses the `.claude/skills` alias and reads `CLAUDE.md`, which points to the shared `AGENTS.md` instructions.
-
-All agents use the same files, so workflows cannot drift between agent-specific copies.
-
-To open a deck without launching a desktop browser, use `npm run open -- <presentation> --no-browser`. If only one deck exists, `<presentation>` may be omitted.
-
-## Keyboard controls
-
-- `←` / `PageUp`: previous slide
-- `→` / `PageDown` / `Space`: next slide
-- Click the right 75% of a slide: next slide; click the left 25%: previous slide
-- `Home` / `End`: first or last slide
-- `F`: fullscreen
-- `P`: print
 
 ## License
 
