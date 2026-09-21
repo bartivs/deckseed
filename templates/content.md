@@ -2,6 +2,7 @@
 pagetitle: {{TITLE_YAML}}
 lang: {{LANGUAGE_YAML}}
 harness-theme: {{THEME_YAML}}
+harness-theme-package: {{THEME_PACKAGE_YAML}}
 audience: "Define the intended audience."
 goal: "Define what the audience should understand or do."
 core-message: "State the presentation's main idea in one sentence."

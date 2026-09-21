@@ -15,6 +15,7 @@
     "serve": "node scripts/serve.mjs",
     "open": "node scripts/open.mjs",
     "themes:previews": "node scripts/generate-theme-previews.mjs",
+    "themes": "node scripts/list-themes.mjs",
     "validate": "node scripts/validate.mjs",
     "test": "node --test"
   },

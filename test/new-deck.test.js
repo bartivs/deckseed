@@ -115,6 +115,7 @@ test("the source hash changes when any authored input changes", () => {
   assert.notEqual(presentationSourceHash({ ...base, content: "changed" }), hash);
   assert.notEqual(presentationSourceHash({ ...base, theme: "changed" }), hash);
   assert.notEqual(presentationSourceHash({ ...base, sharedCss: "changed" }), hash);
+  assert.notEqual(presentationSourceHash({ ...base, baseTheme: "installed-theme" }), hash);
 });
 
 test("self-contained output validation rejects external media", () => {

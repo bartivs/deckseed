@@ -4,6 +4,7 @@ import process from "node:process";
 import { fileURLToPath } from "node:url";
 import { themePresets } from "../src/theme-presets.js";
 import { renderThemeCss } from "./theme-css.mjs";
+import { resolveThemePackage } from "./theme-package.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const args = process.argv.slice(2);
@@ -20,15 +21,23 @@ if (!slug || slug.startsWith("-") || !/^[a-z0-9][a-z0-9-]*$/.test(slug)) {
 
 const title = valueAfter("--title") ?? slug.split("-").map((word) => word[0].toUpperCase() + word.slice(1)).join(" ");
 const language = valueAfter("--language") ?? "en";
-const themeId = valueAfter("--theme") ?? "midnight";
+const themeSelection = valueAfter("--theme") ?? "midnight";
 const force = args.includes("--force");
 if (!/^[a-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$/.test(language)) {
   console.error("--language must be a BCP 47 language code such as en, es, or pt-BR");
   process.exit(1);
 }
-if (!(themeId in themePresets)) {
-  console.error(`--theme must be one of: ${Object.keys(themePresets).join(", ")}`);
-  process.exit(1);
+
+let themeId = themeSelection;
+let externalTheme;
+if (!(themeSelection in themePresets)) {
+  try {
+    externalTheme = await resolveThemePackage({ root, specifier: themeSelection });
+    themeId = externalTheme.id;
+  } catch (error) {
+    console.error(`${error.message}\n--theme must be one of: ${Object.keys(themePresets).join(", ")} or an installed/local Deckseed theme package`);
+    process.exit(1);
+  }
 }
 
 const output = path.join(root, "presentations", slug);
@@ -47,15 +56,20 @@ if (!force) {
 
 const escapeHtml = (value) => value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
 const template = await readFile(path.join(root, "templates", "content.md"), "utf8");
-const content = template
+let content = template
   .replaceAll("{{TITLE_YAML}}", JSON.stringify(title))
   .replaceAll("{{LANGUAGE_YAML}}", JSON.stringify(language))
   .replaceAll("{{THEME_YAML}}", JSON.stringify(themeId))
+  .replaceAll("{{THEME_PACKAGE_YAML}}", externalTheme ? JSON.stringify(themeSelection) : "\"\"")
   .replaceAll("{{TITLE}}", escapeHtml(title));
+if (!externalTheme) content = content.replace(/^harness-theme-package: ""\n/mu, "");
+const localThemeCss = externalTheme
+  ? `/* Local overrides for the ${externalTheme.label} theme. */\n:root {\n}\n`
+  : renderThemeCss(themeId, themePresets[themeId]);
 await mkdir(output, { recursive: true });
 await Promise.all([
   writeFile(contentPath, content),
-  writeFile(themePath, renderThemeCss(themeId, themePresets[themeId])),
+  writeFile(themePath, localThemeCss),
   rm(indexPath, { force: true }),
   rm(path.join(output, "deck.config.js"), { force: true }),
 ]);
@@ -63,5 +77,6 @@ console.log(`Created Pandoc sources in ${path.relative(root, output)}`);
 console.log("Canonical source: content.md");
 console.log(`Language: ${language}`);
 console.log(`Theme: ${themeId}`);
+if (externalTheme) console.log(`Theme package: ${themeSelection}`);
 console.log(`Build: npm run build -- ${slug}`);
 console.log("Presentation files are ignored by Git by design.");

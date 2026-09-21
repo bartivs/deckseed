@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "id": "fixture",
+  "label": "Fixture",
+  "colorScheme": "light",
+  "css": "./theme.css"
+}

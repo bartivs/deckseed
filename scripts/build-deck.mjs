@@ -11,6 +11,7 @@ import {
   presentationSourceHash,
   resolvePresentationDirectory,
 } from "./pandoc-lib.mjs";
+import { readThemeMetadata, resolveThemePackage, themePackageSpecifier } from "./theme-package.mjs";
 
 const execFileAsync = promisify(execFile);
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -43,8 +44,17 @@ try {
     readFile(themePath, "utf8"),
     readFile(sharedCssPath, "utf8"),
   ]);
-  const hash = presentationSourceHash({ content, theme, sharedCss });
-  const resourcePath = [directory, root].join(path.delimiter);
+  const metadata = readThemeMetadata(content);
+  const packageSpecifier = themePackageSpecifier(content);
+  const externalTheme = packageSpecifier
+    ? await resolveThemePackage({ root, specifier: packageSpecifier, expectedId: metadata["harness-theme"] })
+    : undefined;
+  const baseTheme = externalTheme?.baseTheme ?? "";
+  const hash = presentationSourceHash({ content, theme, sharedCss, baseTheme });
+  const resourcePath = [directory, root, ...(externalTheme ? [path.dirname(externalTheme.cssPath)] : [])].join(path.delimiter);
+  const cssArgs = externalTheme
+    ? [`--css=${sharedCssPath}`, `--css=${externalTheme.cssPath}`, `--css=${themePath}`]
+    : [`--css=${sharedCssPath}`, `--css=${themePath}`];
   const args = [
     "content.md",
     "--from=markdown+fenced_divs+bracketed_spans+raw_html",
@@ -54,8 +64,7 @@ try {
     "--slide-level=0",
     `--variable=revealjs-url=${REVEALJS_URL}`,
     `--resource-path=${resourcePath}`,
-    `--css=${sharedCssPath}`,
-    `--css=${themePath}`,
+    ...cssArgs,
     `--output=${temporaryPath}`,
   ];
   await execFileAsync(process.env.PANDOC_BIN || "pandoc", args, {
@@ -69,6 +78,7 @@ try {
   const bundled = injectSourceHash(await readFile(outputPath, "utf8"), hash);
   await writeFile(outputPath, bundled);
   console.log(`Built self-contained Pandoc presentation: ${path.relative(root, outputPath)}`);
+  if (externalTheme) console.log(`Theme package: ${externalTheme.specifier} (${externalTheme.id})`);
 } catch (error) {
   await rm(temporaryPath, { force: true });
   if (error.code === "ENOENT" && error.syscall?.startsWith("spawn")) {

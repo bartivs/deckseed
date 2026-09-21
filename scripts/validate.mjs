@@ -7,6 +7,7 @@ import {
   presentationSourceHash,
   readEmbeddedSourceHash,
 } from "./pandoc-lib.mjs";
+import { readThemeMetadata, resolveThemePackage, themePackageSpecifier } from "./theme-package.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const presentationsRoot = path.join(root, "presentations");
@@ -39,12 +40,26 @@ for (const entry of await readdir(presentationsRoot, { withFileTypes: true })) {
     for (const field of ["pagetitle", "lang", "harness-theme", "audience", "goal", "core-message"]) {
       if (!new RegExp(`^${field}:`, "mu").test(content)) errors.push(`content.md metadata is missing ${field}`);
     }
-    if (!/^\s*--harness-bg\s*:/mu.test(theme)) errors.push("theme.css is missing --harness-bg");
-    if (!/^\s*--harness-text\s*:/mu.test(theme)) errors.push("theme.css is missing --harness-text");
-    if (/@import\s|url\(\s*["']?https?:/iu.test(theme)) errors.push("theme.css must not load remote resources");
+    const packageSpecifier = /^---\n[\s\S]*?\n---(?:\n|$)/u.test(content)
+      ? themePackageSpecifier(content)
+      : "";
+    let externalTheme;
+    if (packageSpecifier) {
+      try {
+        const metadata = readThemeMetadata(content);
+        externalTheme = await resolveThemePackage({ root, specifier: packageSpecifier, expectedId: metadata["harness-theme"] });
+      } catch (error) {
+        errors.push(error.message);
+      }
+    }
+    if (!externalTheme && !packageSpecifier) {
+      if (!/^\s*--harness-bg\s*:/mu.test(theme)) errors.push("theme.css is missing --harness-bg");
+      if (!/^\s*--harness-text\s*:/mu.test(theme)) errors.push("theme.css is missing --harness-text");
+    }
+    if (/@import\s|url\(\s*["']?(?:https?:)?\/\//iu.test(theme)) errors.push("theme.css must not load remote resources");
     try { assertSelfContainedReveal(html); }
     catch (error) { errors.push(error.message); }
-    const expectedHash = presentationSourceHash({ content, theme, sharedCss });
+    const expectedHash = presentationSourceHash({ content, theme, sharedCss, baseTheme: externalTheme?.baseTheme ?? "" });
     const actualHash = readEmbeddedSourceHash(html);
     if (!actualHash) errors.push("generated index.html is missing its source hash; run npm run build");
     else if (actualHash !== expectedHash) errors.push("generated index.html is stale; run npm run build");
@@ -59,7 +74,7 @@ for (const entry of await readdir(presentationsRoot, { withFileTypes: true })) {
 
 const template = await readFile(path.join(root, "templates", "content.md"), "utf8");
 const templateErrors = [];
-for (const placeholder of ["{{TITLE_YAML}}", "{{LANGUAGE_YAML}}", "{{THEME_YAML}}", "{{TITLE}}"] ) {
+for (const placeholder of ["{{TITLE_YAML}}", "{{LANGUAGE_YAML}}", "{{THEME_YAML}}", "{{THEME_PACKAGE_YAML}}", "{{TITLE}}"] ) {
   if (!template.includes(placeholder)) templateErrors.push(`missing ${placeholder}`);
 }
 if (!/^---\n[\s\S]*?\n---\n/u.test(template)) templateErrors.push("missing YAML metadata");

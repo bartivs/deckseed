@@ -1,0 +1,14 @@
+:root {
+  --harness-bg: #f5f1e8;
+  --harness-bg-image: none;
+  --harness-panel: #ffffff;
+  --harness-text: #17202a;
+  --harness-heading: #111820;
+  --harness-muted: #5d6975;
+  --harness-accent: #066b78;
+  --harness-border: rgba(23, 32, 42, 0.18);
+  --harness-font-body: Inter, sans-serif;
+  --harness-font-heading: Georgia, serif;
+  --harness-radius: 12px;
+  --harness-shadow: 0 14px 35px rgba(45, 38, 27, 0.08);
+}

@@ -24,13 +24,15 @@ export function resolvePresentationDirectory(root, requested) {
   return directory;
 }
 
-export function presentationSourceHash({ content, theme, sharedCss }) {
-  return createHash("sha256")
+export function presentationSourceHash({ content, theme, sharedCss, baseTheme = "" }) {
+  const hash = createHash("sha256")
     .update(BUILD_SIGNATURE)
     .update("\0content\0")
     .update(content)
     .update("\0theme\0")
-    .update(theme)
+    .update(theme);
+  if (baseTheme) hash.update("\0base-theme\0").update(baseTheme);
+  return hash
     .update("\0shared-css\0")
     .update(sharedCss)
     .digest("hex");
