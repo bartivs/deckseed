@@ -4,7 +4,7 @@
 
 - **Token-efficient authoring:** agents edit compact Markdown and CSS, never the generated runtime.
 - **Self-contained HTML slides:** Reveal.js, themes, and media are embedded for offline sharing.
-- **Presentation themes:** nine accessible presets provide dark, light, editorial, and professional starting points.
+- **Presentation themes:** nine accessible built-in presets plus installable external theme packages provide dark, light, editorial, and professional starting points.
 - **Source freshness:** SHA-256 validation detects generated decks that no longer match their source.
 - **Private by default:** local presentation content stays ignored by Git.
 - **Agent workflows included:** shared skills enforce content approval, theming, translation, and validation.
@@ -54,7 +54,7 @@ The generated HTML may be large because it contains the complete presentation ru
 ```text
 Chat approval
       ↓
-content.md + theme.css
+content.md + theme package + theme.css
       ↓
 Pandoc Reveal.js writer
       ↓
@@ -93,7 +93,7 @@ Deckseed creates only maintainable source files:
 ```text
 presentations/quarterly-strategy/
 ├── content.md   Approved metadata, copy, and Pandoc slide structure
-└── theme.css    Fixed presentation theme and local visual overrides
+└── theme.css    Deck-specific theme overrides
 ```
 
 ### 3. Write slides in Markdown
@@ -158,7 +158,7 @@ npm run open -- quarterly-strategy
 
 ## Presentation theme gallery
 
-Theme choice belongs to the presentation source, not to a viewer preference. The generator writes the selected preset into `theme.css`; generated decks do not expose a theme selector.
+Theme choice belongs to the presentation source, not to a viewer preference. The generator writes built-in theme CSS or external-theme metadata plus local overrides; generated decks do not expose a theme selector.
 
 | Theme | Preview | Designed for |
 | --- | --- | --- |
@@ -173,6 +173,23 @@ Theme choice belongs to the presentation source, not to a viewer preference. The
 | `meadow` | <img src="docs/theme-previews/meadow.svg" alt="Meadow green presentation theme preview" width="240"> | Sustainability, people, lifestyle, organic brands |
 
 The presets are original interpretations of recurring families found in [Reveal.js themes](https://revealjs.com/themes/), [Marp themes](https://github.com/marp-team/marp-core/blob/main/themes/README.md), and minimalist or professional presentation templates. Customize the ignored `theme.css` after scaffolding and rebuild whenever it changes.
+
+### External theme packages
+
+Themes can also be maintained in separate repositories and installed as npm packages or used directly from a local directory:
+
+```bash
+npm install --save-dev deckseed-theme-cobalt
+npm run new -- product-review --theme deckseed-theme-cobalt
+
+# Develop against a local theme repository.
+npm run new -- product-review --theme ../deckseed-theme-cobalt
+npm run themes
+```
+
+An external theme package contains a `deckseed-theme.json` manifest and a `theme.css` file. The manifest declares `schemaVersion: 1`, a stable theme `id`, a display `label`, `colorScheme`, and a relative `css` path. Deckseed records the package specifier in `harness-theme-package`; the presentation's `theme.css` then contains only local overrides. Package CSS is embedded into the generated HTML before those overrides, so the final deck remains self-contained.
+
+External themes are declarative CSS packages. Deckseed never imports or executes package JavaScript. Theme CSS cannot use `@import`, remote URLs, or non-embedded `url(...)` resources. Pin installed versions through `package.json` and its lockfile for reproducible builds. Official theme packages are not published yet; extracting selected built-ins into separate repositories is planned follow-up work.
 
 ## Deckseed compared with other slide workflows
 
@@ -245,7 +262,7 @@ No. Deckseed is a local build and validation pipeline. Agent Skills improve AI-a
 
 ### How are custom themes created?
 
-Start from one of the nine presets, then edit the ignored deck-specific `theme.css`. Shared structural styles live in `src/pandoc.css`.
+For a deck-specific variation, start from one of the nine presets and edit the ignored `theme.css`. For a reusable theme, create a separate package with `deckseed-theme.json` and `theme.css`, install it as a dependency, and scaffold with `--theme <package-name>`. Shared structural styles live in `src/pandoc.css`. Run `npm run themes` to list built-ins and installed external themes.
 
 ## Commands
 
@@ -255,6 +272,7 @@ npm run build -- <slug>          # Generate self-contained Reveal.js HTML
 npm run bundle -- <slug>         # Compatibility alias for build
 npm run serve                    # Serve local decks on port 4173
 npm run open -- <slug>           # Start the server and open a deck
+npm run themes                   # List built-in and installed external themes
 npm run themes:previews          # Regenerate README theme previews
 npm run validate                 # Validate source and generated output
 npm test                         # Run the test suite
@@ -264,14 +282,15 @@ Generator options:
 
 - `--title "Title"`
 - `--language en|es|pt-BR|...`
-- `--theme midnight|paper|ember|atlas|solar|ocean|plum|mono|meadow`
+- `--theme midnight|paper|ember|atlas|solar|ocean|plum|mono|meadow|<installed-package>|<local-theme-path>`
 - `--force` to replace an existing local deck
 
 ## Repository structure
 
 ```text
 src/pandoc.css                Shared Reveal.js presentation styling
-src/theme-presets.js          Generator theme presets
+src/theme-presets.js          Built-in generator theme presets
+scripts/theme-package.mjs     External theme manifest and CSS resolver
 scripts/build-deck.mjs        Pandoc build and self-contained-output checks
 scripts/new-deck.mjs          Source scaffolding
 scripts/validate.mjs          Freshness, portability, and privacy validation

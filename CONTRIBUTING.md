@@ -8,7 +8,7 @@ Thanks for helping improve Deckseed, an agent-first Markdown presentation genera
 - Pandoc 3 or newer
 - Git
 
-Deckseed has no npm runtime dependencies.
+Deckseed has no npm runtime dependencies. External theme packages are optional development dependencies and must follow the declarative `deckseed-theme.json` and `theme.css` contract.
 
 ## Local verification
 
@@ -41,8 +41,8 @@ The command must return no paths.
 
 ## Project structure
 
-- `src/` contains shared CSS and theme presets.
-- `scripts/` contains scaffolding, build, server, and validation logic.
+- `src/` contains shared CSS and built-in theme presets.
+- `scripts/` contains scaffolding, build, theme resolution, server, and validation logic.
 - `templates/` contains tracked starter sources.
 - `.agents/skills/` contains the canonical agent workflows.
 - `docs/` contains public project and theme assets.
@@ -53,6 +53,8 @@ The command must return no paths.
 - Keep `content.md` as the canonical presentation source and `index.html` as disposable generated output.
 - Preserve self-contained HTML output: no external scripts, stylesheets, or media.
 - Keep theme tokens semantic and maintain accessible contrast.
+- External themes must be declarative CSS packages; never execute package JavaScript during discovery or builds.
+- Reject remote theme resources and keep package CSS paths inside the theme package.
 - Add or update tests for build, validation, theme, or routing behavior.
 - Keep commits atomic and describe the change accurately.
 

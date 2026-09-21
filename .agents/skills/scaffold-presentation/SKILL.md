@@ -1,6 +1,6 @@
 ---
 name: scaffold-presentation
-description: Iterates on and obtains approval for presentation ideas, then creates a local Pandoc Markdown deck with a fixed theme and self-contained Reveal.js output.
+description: Iterates on and obtains approval for presentation ideas, then creates a local Pandoc Markdown deck with a built-in or external theme and self-contained Reveal.js output.
 license: MIT
 compatibility: Node.js 20 or newer; Pandoc 3 or newer
 ---
@@ -16,11 +16,13 @@ compatibility: Node.js 20 or newer; Pandoc 3 or newer
 
    ```bash
    npm run new -- <slug> --title "<TITLE>" --language en --theme midnight
+   # Or use an installed package/local theme path:
+   npm run new -- <slug> --theme deckseed-theme-example
    ```
 
 5. Replace the starter material in `presentations/<slug>/content.md` with the approved metadata and complete slide copy. This file is both the approval artifact and Pandoc source.
 6. Use Pandoc Markdown, fenced divs, and minimal trusted local HTML only when a visual layout needs it. Never edit generated `index.html`.
-7. Customize `theme.css` only for deck-specific visual requirements.
+7. Customize `theme.css` only for deck-specific visual requirements. With an external theme package, this file is a local override layer; the package CSS is resolved at build time and is never copied into the deck.
 8. Build and validate:
 
    ```bash
@@ -38,4 +40,6 @@ compatibility: Node.js 20 or newer; Pandoc 3 or newer
 - Do not materially change approved content without renewed approval.
 - Keep one language per source deck; use the localization skill for another language.
 - The generated HTML must remain self-contained, with no external script or stylesheet tags.
+- External themes must use the declarative `deckseed-theme.json` and `theme.css` contract; never execute package JavaScript.
+- Run `npm run themes` to inspect built-in and installed external themes.
 - Use `--force` only when the user explicitly approves replacing an existing local deck.
