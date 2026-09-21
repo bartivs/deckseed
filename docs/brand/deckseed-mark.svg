@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" role="img" aria-labelledby="title description">
+  <title id="title">Deckseed logo</title>
+  <desc id="description">A seed sprouting inside a presentation slide.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b1f35"/>
+      <stop offset="1" stop-color="#07111f"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#56d7e8"/>
+      <stop offset="1" stop-color="#6ee7a8"/>
+    </linearGradient>
+  </defs>
+  <rect x="4" y="4" width="120" height="120" rx="28" fill="url(#background)" stroke="#264561" stroke-width="4"/>
+  <rect x="25" y="28" width="78" height="58" rx="10" fill="#102747" stroke="#56d7e8" stroke-width="4"/>
+  <path d="M38 44h29M38 56h19" fill="none" stroke="#f5f7fb" stroke-linecap="round" stroke-width="5"/>
+  <path d="M64 101V77" fill="none" stroke="url(#accent)" stroke-linecap="round" stroke-width="6"/>
+  <path d="M64 86c-14 0-22-8-22-20 13 0 22 7 22 20Z" fill="#56d7e8"/>
+  <path d="M64 78c13 0 21-7 21-18-12 0-21 6-21 18Z" fill="#6ee7a8"/>
+</svg>
