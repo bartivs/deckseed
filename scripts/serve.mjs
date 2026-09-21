@@ -19,7 +19,7 @@ function safePath(url) {
 
 function directoryPage(requestPath, entries) {
   const rows = entries.map((entry) => `<li><a href="${path.posix.join(requestPath, entry.name)}${entry.isDirectory() ? "/" : ""}">${entry.name}${entry.isDirectory() ? "/" : ""}</a></li>`).join("");
-  return `<!doctype html><meta charset="utf-8"><title>Presentations</title><style>body{font:16px system-ui;max-width:850px;margin:60px auto;padding:0 24px;background:#07111f;color:#f2f7fb}a{color:#56d7e8}li{margin:12px 0}</style><h1>Presentation Harness</h1><ul>${rows || "<li>No local presentations yet.</li>"}</ul>`;
+  return `<!doctype html><meta charset="utf-8"><title>Deckseed presentations</title><style>body{font:16px system-ui;max-width:850px;margin:60px auto;padding:0 24px;background:#07111f;color:#f2f7fb}a{color:#56d7e8}li{margin:12px 0}</style><h1>Deckseed</h1><ul>${rows || "<li>No local presentations yet.</li>"}</ul>`;
 }
 
 createServer(async (request, response) => {
@@ -52,4 +52,4 @@ createServer(async (request, response) => {
     response.writeHead(error?.code === "ENOENT" ? 404 : 500);
     response.end(error?.code === "ENOENT" ? "Not found" : "Internal server error");
   }
-}).listen(port, host, () => console.log(`Presentation harness: http://${host}:${port}`));
+}).listen(port, host, () => console.log(`Deckseed: http://${host}:${port}`));

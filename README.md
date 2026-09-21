@@ -1,12 +1,12 @@
-# Presentation Harness
+# Deckseed — Agent-first Markdown presentation generator
 
-A token-efficient, agent-first presentation pipeline built on Pandoc's Reveal.js writer. Authors maintain one approved `content.md` source and one `theme.css`; the build produces a self-contained `index.html` with navigation, touch controls, fullscreen, progress, print support, and embedded assets. Presentation content stays local and ignored by Git.
+**Compact source. Complete deck.** Deckseed turns approved Markdown into polished, self-contained Reveal.js presentations through Pandoc. Authors maintain one `content.md` source and one `theme.css`; Deckseed generates an offline `index.html` with navigation, touch controls, fullscreen, progress, print support, and embedded assets. Presentation content stays local and ignored by Git.
 
 ## Differentiator: optimize authoring tokens, not generated output
 
-Most presentation generators optimize the final artifact. This harness also optimizes the **AI production loop**: agents read and edit only compact Markdown and theme CSS, while Pandoc owns the large runtime HTML.
+Most presentation generators optimize the final artifact. Deckseed also optimizes the **AI production loop**: agents read and edit only compact Markdown and theme CSS, while Pandoc owns the large runtime HTML.
 
-| Conventional agent-authored deck | This harness |
+| Conventional agent-authored deck | Deckseed |
 | --- | --- |
 | Copy is repeated across briefs, HTML, and configuration | Approved copy and slide implementation share one `content.md` |
 | The model edits verbose generated markup | Generated `index.html` is disposable and never model-authored |

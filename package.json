@@ -1,10 +1,10 @@
 {
-  "name": "presentation-harness",
+  "name": "deckseed",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "A Pandoc and Reveal.js pipeline for self-contained HTML presentations.",
-  "keywords": ["presentation", "slides", "pandoc", "reveal.js", "agent-skill"],
+  "description": "Agent-first Markdown presentation generator for self-contained Pandoc and Reveal.js slide decks.",
+  "keywords": ["markdown-presentation-generator", "presentation-as-code", "ai-agents", "slides", "pandoc", "reveal.js", "offline-html", "agent-skill"],
   "pi": {
     "skills": ["./.agents/skills"]
   },
