@@ -1,10 +1,43 @@
 # Deckseed — Agent-first Markdown presentation generator
 
-**Compact source. Complete deck.** Deckseed turns approved Markdown into polished, self-contained Reveal.js presentations through Pandoc. Authors maintain one `content.md` source and one `theme.css`; Deckseed generates an offline `index.html` with navigation, touch controls, fullscreen, progress, print support, and embedded assets. Presentation content stays local and ignored by Git.
+**Compact source. Complete deck.** Deckseed turns approved Markdown into polished, self-contained Reveal.js presentations through Pandoc. It is a presentation-as-code workflow for AI coding agents, developers, consultants, and technical teams that want portable HTML slide decks without maintaining generated markup.
 
-## Differentiator: optimize authoring tokens, not generated output
+- **Token-efficient authoring:** agents edit compact Markdown and CSS, never the generated runtime.
+- **Self-contained HTML slides:** Reveal.js, themes, and media are embedded for offline sharing.
+- **Presentation themes:** nine accessible presets provide dark, light, editorial, and professional starting points.
+- **Source freshness:** SHA-256 validation detects generated decks that no longer match their source.
+- **Private by default:** local presentation content stays ignored by Git.
+- **Agent workflows included:** shared skills enforce content approval, theming, translation, and validation.
 
-Most presentation generators optimize the final artifact. Deckseed also optimizes the **AI production loop**: agents read and edit only compact Markdown and theme CSS, while Pandoc owns the large runtime HTML.
+## Quick start
+
+Prerequisites: Node.js 20 or newer, Pandoc 3 or newer, and network access while building the embedded Reveal.js runtime.
+
+```bash
+git clone https://github.com/bartivs/deckseed.git
+cd deckseed
+
+npm run new -- architecture-review \
+  --title "Architecture Review" \
+  --language en \
+  --theme atlas
+
+# Replace the starter copy with the approved presentation.
+npm run build -- architecture-review
+npm run validate
+```
+
+Open or share:
+
+```text
+presentations/architecture-review/index.html
+```
+
+The generated file works offline and does not require Deckseed, Pandoc, Node.js, or local assets when viewed.
+
+## Why Deckseed is different
+
+Most presentation generators optimize the final artifact. Deckseed also optimizes the **AI production loop**: the maintained source remains small while Pandoc owns the large runtime output.
 
 | Conventional agent-authored deck | Deckseed |
 | --- | --- |
@@ -14,107 +47,99 @@ Most presentation generators optimize the final artifact. Deckseed also optimize
 | Source/output drift is found manually | A SHA-256 source stamp makes stale output a validation error |
 | Sharing may require local assets or dependencies | Pandoc embeds Reveal.js, CSS, and media into one offline HTML file |
 
-The generated HTML may be large because it contains the complete runtime. The efficiency gain is in the material humans and agents maintain: a small, stable source surface that reduces context usage, duplicated edits, and opportunities for drift.
+The generated HTML may be large because it contains the complete presentation runtime. The efficiency gain is in what humans and agents maintain: a compact, stable source surface with fewer duplicated edits and fewer opportunities for drift.
 
-## Why Pandoc
-
-Pandoc keeps the model-facing source compact: slide copy, document metadata, and layout annotations live in Markdown instead of duplicated HTML and JavaScript configuration. Generated HTML is disposable and must never be hand-edited.
+## Markdown-to-presentation pipeline
 
 ```text
-Chat approval → content.md + theme.css → Pandoc/Reveal.js → index.html → validation
+Chat approval
+      ↓
+content.md + theme.css
+      ↓
+Pandoc Reveal.js writer
+      ↓
+self-contained index.html
+      ↓
+source and portability validation
 ```
 
-The build uses:
+Deckseed uses:
 
-- Pandoc's `revealjs` writer;
+- Pandoc's [`revealjs` writer](https://pandoc.org/MANUAL.html#slide-shows);
 - Reveal.js 5.2.1, pinned for reproducible output;
-- `--embed-resources` for a single shareable HTML file;
-- a SHA-256 source stamp so validation detects stale output.
+- Pandoc `--embed-resources` for a single portable HTML file;
+- semantic CSS variables for reusable presentation themes;
+- a SHA-256 build stamp for deterministic freshness checks.
 
-See the official [Pandoc slide-show documentation](https://pandoc.org/MANUAL.html#slide-shows) and [installation guide](https://pandoc.org/installing.html).
+Set `PANDOC_BIN=/path/to/pandoc` when Pandoc is not available on `PATH`. See the official [Pandoc installation guide](https://pandoc.org/installing.html).
 
-## Prerequisites
-
-- Node.js 20 or newer
-- Pandoc 3 or newer available as `pandoc`
-- Network access during builds so Pandoc can fetch the pinned Reveal.js assets; generated decks work offline
-
-Check the installation:
-
-```bash
-node --version
-pandoc --version
-```
-
-Set `PANDOC_BIN=/path/to/pandoc` when the executable is not on `PATH`.
-
-## Production pipeline
+## Authoring a presentation
 
 ### 1. Approve the content
 
-First agree in chat on the audience, goal, core message, narrative, slide outline, language, and visual direction. Do not create presentation files before approval.
+Before creating files, agree on the audience, goal, core message, narrative, slide outline, language, and visual direction. Deckseed's included Agent Skills treat this approval as a required production gate.
 
-### 2. Scaffold the source
+### 2. Scaffold the Markdown source
 
 ```bash
-npm run new -- architecture-review \
-  --title "Architecture Review" \
+npm run new -- quarterly-strategy \
+  --title "Quarterly Strategy" \
   --language en \
-  --theme atlas
+  --theme midnight
 ```
 
-This creates only source files:
+Deckseed creates only maintainable source files:
 
 ```text
-presentations/architecture-review/
+presentations/quarterly-strategy/
 ├── content.md   Approved metadata, copy, and Pandoc slide structure
 └── theme.css    Fixed presentation theme and local visual overrides
 ```
 
-### 3. Implement in Markdown
+### 3. Write slides in Markdown
 
-`content.md` is both the approval artifact and production source:
+`content.md` is both the approval artifact and the production source:
 
 ```markdown
 ---
-pagetitle: "Architecture Review"
+pagetitle: "Quarterly Strategy"
 lang: "en"
-harness-theme: "atlas"
-audience: "Engineering and product leadership"
-goal: "Agree on the target architecture"
-core-message: "A smaller platform surface improves delivery speed"
+harness-theme: "midnight"
+audience: "Product and engineering leadership"
+goal: "Agree on the next-quarter priorities"
+core-message: "Fewer priorities create faster delivery"
 controls: true
 progress: true
 slideNumber: true
 transition: fade
 ---
 
-<div class="eyebrow">Architecture</div>
+<div class="eyebrow">Strategy</div>
 
-# Architecture Review
+# Quarterly Strategy
 
-A smaller platform surface improves delivery speed.
+Fewer priorities create faster delivery.
 
 ---
 
-# Decision
+# Three priorities
 
-- Consolidate shared services
-- Publish stable contracts
-- Migrate incrementally
+- Improve activation
+- Reduce operational drag
+- Retain high-value customers
 ```
 
-Horizontal rules separate slides. Use ordinary Markdown by default, fenced divs for layout groups, and trusted local HTML only when the design requires it.
+Horizontal rules separate slides. Use ordinary Markdown by default, fenced divs for layout groups, and trusted local HTML only when a visual treatment requires it.
 
-### 4. Build
+### 4. Generate the presentation
 
 ```bash
-npm run build -- architecture-review
+npm run build -- quarterly-strategy
 ```
 
-The resulting `presentations/architecture-review/index.html` contains its Reveal.js runtime, shared CSS, deck CSS, and media inline. `npm run bundle -- <slug>` remains as a compatibility alias.
+Pandoc produces `index.html` with the Reveal.js runtime, shared styles, deck theme, and media inline. `npm run bundle -- <slug>` remains a compatibility alias.
 
-### 5. Validate
+### 5. Validate and preview
 
 ```bash
 npm test
@@ -123,23 +148,65 @@ git diff --check
 git status --short --ignored
 ```
 
-Validation rejects missing sources, remote theme resources, external scripts or stylesheets, non-Reveal output, and stale generated HTML.
+Validation rejects missing sources, stale generated output, remote theme resources, external scripts or stylesheets, and non-Reveal HTML.
 
-### 6. Preview or share
-
-The normal deliverable is the generated static file:
-
-```text
-presentations/<slug>/index.html
-```
-
-It can be copied or opened directly without the repository. Start the local server only when an interactive browser preview is requested:
+Start a local preview only when needed:
 
 ```bash
-npm run open -- <slug>
+npm run open -- quarterly-strategy
 ```
 
-## Privacy boundary
+## Presentation theme gallery
+
+Theme choice belongs to the presentation source, not to a viewer preference. The generator writes the selected preset into `theme.css`; generated decks do not expose a theme selector.
+
+| Theme | Preview | Designed for |
+| --- | --- | --- |
+| `midnight` | <img src="docs/theme-previews/midnight.svg" alt="Midnight dark technical presentation theme preview" width="240"> | Technical talks, product launches, data-heavy stories |
+| `paper` | <img src="docs/theme-previews/paper.svg" alt="Paper editorial presentation theme preview" width="240"> | Editorial narratives, reports, thoughtful long-form decks |
+| `ember` | <img src="docs/theme-previews/ember.svg" alt="Ember dark orange presentation theme preview" width="240"> | Bold keynotes, launches, energetic pitches |
+| `atlas` | <img src="docs/theme-previews/atlas.svg" alt="Atlas executive presentation theme preview" width="240"> | Executive reviews, strategy, premium proposals |
+| `solar` | <img src="docs/theme-previews/solar.svg" alt="Solar warm light presentation theme preview" width="240"> | Workshops, documentation, warm technical decks |
+| `ocean` | <img src="docs/theme-previews/ocean.svg" alt="Ocean light blue presentation theme preview" width="240"> | Education, healthcare, calm explanatory stories |
+| `plum` | <img src="docs/theme-previews/plum.svg" alt="Plum purple dark presentation theme preview" width="240"> | Creative technology, demos, modern night-mode decks |
+| `mono` | <img src="docs/theme-previews/mono.svg" alt="Mono black and white presentation theme preview" width="240"> | Minimal portfolios, architecture, sharp product narratives |
+| `meadow` | <img src="docs/theme-previews/meadow.svg" alt="Meadow green presentation theme preview" width="240"> | Sustainability, people, lifestyle, organic brands |
+
+The presets are original interpretations of recurring families found in [Reveal.js themes](https://revealjs.com/themes/), [Marp themes](https://github.com/marp-team/marp-core/blob/main/themes/README.md), and minimalist or professional presentation templates. Customize the ignored `theme.css` after scaffolding and rebuild whenever it changes.
+
+## Deckseed compared with other slide workflows
+
+| Workflow | Authoring source | Output model | Best fit |
+| --- | --- | --- | --- |
+| **Deckseed** | Approved Pandoc Markdown plus CSS | Self-contained Reveal.js HTML | Agent-assisted, private, presentation-as-code workflows |
+| Raw Reveal.js | HTML, JavaScript, or Reveal Markdown | Interactive web presentation | Bespoke browser interactions and plugin-heavy talks |
+| Marp | Marp-flavored Markdown | HTML, PDF, PPTX, and images | Concise general-purpose Markdown slides |
+| Pandoc alone | General Markdown and CLI options | Multiple slide formats | Users who want direct control without an opinionated workflow |
+| Traditional AI slide service | Prompt and proprietary editor | Hosted or exported deck | Fast visual drafting without source-controlled authoring |
+
+Deckseed does not replace Pandoc or Reveal.js. It packages them into a repeatable approval, authoring, theming, validation, and privacy workflow for coding agents.
+
+## Use cases
+
+- **Technical presentations:** architecture reviews, engineering proposals, incident reviews, and product demonstrations.
+- **Consulting deliverables:** reusable private decks that remain outside Git history.
+- **Executive communication:** strategy updates, investment analyses, and decision briefs.
+- **Presentation as code:** reviewable Markdown sources with generated, disposable output.
+- **Offline HTML slides:** a single file that can be copied, archived, emailed, or opened without a server.
+- **Agent-generated presentations:** bounded workflows for Pi, Codex, Claude Code, and OpenCode.
+
+## Localization
+
+One source deck has one language. A translated presentation gets a separate Markdown source and generated HTML:
+
+```text
+presentations/quarterly-review/
+presentations/quarterly-review-es/
+```
+
+This avoids large runtime translation dictionaries and keeps each source readable. Preserve slide structure, translate the complete deck, set the correct `lang`, and build both outputs independently.
+
+## Privacy model
 
 Everything inside `presentations/` is ignored except `.gitkeep`:
 
@@ -148,38 +215,37 @@ presentations/*
 !presentations/.gitkeep
 ```
 
-Never use `git add -f` for a presentation. Decks may contain internal plans, customer information, or unpublished research.
+Never use `git add -f` for a presentation. Decks may contain internal plans, customer information, financial analysis, or unpublished research.
 
-## Themes
+## Frequently asked questions
 
-Theme choice is part of the presentation source, not a viewer preference. The generator writes the selected preset to `theme.css`; there is no runtime theme selector.
+### What is a Markdown presentation generator?
 
-The presets are original interpretations of common families in [Reveal.js themes](https://revealjs.com/themes/), [Marp's built-in themes](https://github.com/marp-team/marp-core/blob/main/themes/README.md), and popular minimalist/professional template categories. These references identify recurring styles, not an objective popularity ranking.
+A Markdown presentation generator converts structured Markdown into slides. Deckseed uses Pandoc to parse the source and Reveal.js to provide browser navigation, scaling, transitions, and presentation controls.
 
-| Theme | Preview | Designed for |
-| --- | --- | --- |
-| `midnight` | <img src="docs/theme-previews/midnight.svg" alt="Midnight theme demo" width="240"> | Technical talks, product launches, data-heavy stories |
-| `paper` | <img src="docs/theme-previews/paper.svg" alt="Paper theme demo" width="240"> | Editorial narratives, reports, thoughtful long-form decks |
-| `ember` | <img src="docs/theme-previews/ember.svg" alt="Ember theme demo" width="240"> | Bold keynotes, launches, energetic pitches |
-| `atlas` | <img src="docs/theme-previews/atlas.svg" alt="Atlas theme demo" width="240"> | Executive reviews, strategy, premium proposals |
-| `solar` | <img src="docs/theme-previews/solar.svg" alt="Solar theme demo" width="240"> | Workshops, documentation, warm technical decks |
-| `ocean` | <img src="docs/theme-previews/ocean.svg" alt="Ocean theme demo" width="240"> | Education, healthcare, calm explanatory stories |
-| `plum` | <img src="docs/theme-previews/plum.svg" alt="Plum theme demo" width="240"> | Creative technology, demos, modern night-mode decks |
-| `mono` | <img src="docs/theme-previews/mono.svg" alt="Mono theme demo" width="240"> | Minimal portfolios, architecture, sharp product narratives |
-| `meadow` | <img src="docs/theme-previews/meadow.svg" alt="Meadow theme demo" width="240"> | Sustainability, people, lifestyle, organic brands |
+### Can Pandoc generate a self-contained Reveal.js presentation?
 
-Customize the ignored `theme.css` after scaffolding. Rebuild whenever it changes. Run `npm run themes:previews` after changing the tracked preset library.
+Yes. Deckseed invokes Pandoc's Reveal.js writer with standalone and embedded-resource options, then verifies that the result has no external script, stylesheet, or media dependencies.
 
-## Localization
+### Why is Deckseed more token-efficient for AI agents?
 
-One source deck has one language. A translated presentation gets a separate source and generated HTML, for example:
+Agents maintain `content.md` and `theme.css` instead of reading or rewriting the generated Reveal.js runtime. This keeps generated megabytes outside the normal model context and eliminates duplicated copy in configuration and HTML.
 
-```text
-presentations/quarterly-review/
-presentations/quarterly-review-es/
-```
+### Does the generated presentation work offline?
 
-This avoids large runtime translation dictionaries and keeps each Markdown source readable. Preserve slide structure, translate the complete deck, set the correct `lang`, and build both outputs independently.
+Yes. The generated `index.html` embeds its runtime and presentation assets. Network access is needed during the build so Pandoc can fetch the pinned Reveal.js files, but not while presenting the finished deck.
+
+### Can Deckseed export PDF or PowerPoint?
+
+The primary artifact is self-contained HTML. Reveal.js presentations can be printed to PDF. Pandoc also supports PowerPoint output, but Deckseed does not currently wrap or validate that output path.
+
+### Does Deckseed require an AI service?
+
+No. Deckseed is a local build and validation pipeline. Agent Skills improve AI-assisted production, but Markdown authoring and Pandoc generation work without an AI provider.
+
+### How are custom themes created?
+
+Start from one of the nine presets, then edit the ignored deck-specific `theme.css`. Shared structural styles live in `src/pandoc.css`.
 
 ## Commands
 
@@ -189,7 +255,7 @@ npm run build -- <slug>          # Generate self-contained Reveal.js HTML
 npm run bundle -- <slug>         # Compatibility alias for build
 npm run serve                    # Serve local decks on port 4173
 npm run open -- <slug>           # Start the server and open a deck
-npm run themes:previews          # Regenerate README theme demos
+npm run themes:previews          # Regenerate README theme previews
 npm run validate                 # Validate source and generated output
 npm test                         # Run the test suite
 ```
@@ -211,10 +277,14 @@ scripts/new-deck.mjs          Source scaffolding
 scripts/validate.mjs          Freshness, portability, and privacy validation
 templates/content.md          Tracked Pandoc starter source
 presentations/                Ignored source decks and generated output
-docs/theme-previews/          README theme demos
-test/                         Harness tests
+docs/theme-previews/          README theme previews
+test/                         Deckseed tests
 ```
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, verification requirements, and the presentation privacy boundary.
 
 ## License
 
-MIT
+Deckseed is available under the [MIT License](LICENSE).
