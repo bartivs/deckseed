@@ -39,17 +39,41 @@ After building, start or reuse the local server without opening a GUI browser:
 npm run open -- <slug> --no-browser
 ```
 
-Capture representative slides at the authored 1600×900 canvas. Replace the Reveal hash with the slide under review:
+Capture representative slides at the authored 1600×900 canvas. Replace the Reveal hash with the slide under review. Prefer Firefox, fall back to a Chromium-family browser, and use the system default browser only for manual review:
 
 ```bash
-firefox --headless --window-size 1600,900 \
-  --screenshot /tmp/deck-theme-check.png \
-  'http://127.0.0.1:4173/presentations/<slug>/#/2' \
-  >/tmp/firefox-shot.log 2>&1
-test -s /tmp/deck-theme-check.png && echo screenshot-ok
+url='http://127.0.0.1:4173/presentations/<slug>/#/2'
+output=/tmp/deck-theme-check.png
+manual_review=0
+
+if command -v firefox >/dev/null 2>&1; then
+  firefox --headless --window-size 1600,900 \
+    --screenshot "$output" "$url" \
+    >/tmp/deck-theme-check.log 2>&1
+else
+  browser=""
+  for candidate in chromium chromium-browser google-chrome google-chrome-stable microsoft-edge; do
+    if command -v "$candidate" >/dev/null 2>&1; then browser="$candidate"; break; fi
+  done
+  if [ -n "$browser" ]; then
+    "$browser" --headless --disable-gpu --hide-scrollbars \
+      --window-size=1600,900 --screenshot="$output" "$url" \
+      >/tmp/deck-theme-check.log 2>&1
+  else
+    echo "No screenshot-capable browser found; opening the default browser for manual review."
+    manual_review=1
+    npm run open -- <slug>
+  fi
+fi
+
+if [ "$manual_review" -eq 0 ]; then
+  test -s "$output" && echo screenshot-ok
+else
+  echo manual-review-required
+fi
 ```
 
-Use the `read` tool to inspect `/tmp/deck-theme-check.png` as an image. Do not treat a successful screenshot command as visual approval. Review at least:
+Use the `read` tool to inspect `/tmp/deck-theme-check.png` as an image. Do not treat a successful screenshot command as visual approval. The default-browser fallback does not produce an inspectable PNG, so do not mark visual validation complete until the user confirms the manual result or a supported headless browser becomes available. Review at least:
 
 - the title slide;
 - a multi-card grid;

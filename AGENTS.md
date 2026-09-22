@@ -67,14 +67,40 @@ After building, capture representative slides with a headless browser. Check at 
 
 ```bash
 npm run open -- <slug> --no-browser
-firefox --headless --window-size 1600,900 \
-  --screenshot /tmp/deck-theme-check.png \
-  'http://127.0.0.1:4173/presentations/<slug>/#/2' \
-  >/tmp/firefox-shot.log 2>&1
-test -s /tmp/deck-theme-check.png && echo screenshot-ok
+url='http://127.0.0.1:4173/presentations/<slug>/#/2'
+output=/tmp/deck-theme-check.png
+manual_review=0
+
+if command -v firefox >/dev/null 2>&1; then
+  firefox --headless --window-size 1600,900 \
+    --screenshot "$output" "$url" \
+    >/tmp/deck-theme-check.log 2>&1
+else
+  browser=""
+  for candidate in chromium chromium-browser google-chrome google-chrome-stable microsoft-edge; do
+    if command -v "$candidate" >/dev/null 2>&1; then browser="$candidate"; break; fi
+  done
+  if [ -n "$browser" ]; then
+    "$browser" --headless --disable-gpu --hide-scrollbars \
+      --window-size=1600,900 --screenshot="$output" "$url" \
+      >/tmp/deck-theme-check.log 2>&1
+  else
+    echo "No screenshot-capable browser found; opening the default browser for manual review."
+    manual_review=1
+    npm run open -- <slug>
+  fi
+fi
+
+if [ "$manual_review" -eq 0 ]; then
+  test -s "$output" && echo screenshot-ok
+else
+  echo manual-review-required
+fi
 ```
 
 Use the `read` tool to inspect `/tmp/deck-theme-check.png` as an image. Iterate until margins, hierarchy, overflow, wrapping, contrast, and visual balance are acceptable. Use different Reveal hashes to inspect other representative slides.
+
+The default-browser fallback is manual only: it does not create a screenshot. Do not claim visual validation is complete unless the user confirms the result or a screenshot-capable browser is installed and its PNG has been inspected.
 
 ## Verification
 

@@ -11,7 +11,7 @@
 
 ## Quick start
 
-Prerequisites: Node.js 20 or newer, Pandoc 3 or newer, and network access while building the embedded Reveal.js runtime.
+Prerequisites: Node.js 20 or newer, Pandoc 3 or newer, and network access while building the embedded Reveal.js runtime. Firefox is a recommended optional dependency for automated 1600×900 headless screenshot validation; Chromium-family browsers are also supported as a fallback.
 
 ```bash
 git clone https://github.com/bartivs/deckseed.git
@@ -149,6 +149,8 @@ git status --short --ignored
 ```
 
 Validation rejects missing sources, stale generated output, remote theme resources, external scripts or stylesheets, and non-Reveal HTML.
+
+For visual theme checks, Firefox is recommended because it can capture deterministic headless screenshots for image review. If Firefox is unavailable, use Chromium, Chrome, or Edge in headless mode; the default browser remains a manual-review fallback.
 
 Start a local preview only when needed:
 
