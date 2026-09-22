@@ -45,9 +45,36 @@ Use the shared Agent Skills under `.agents/skills/`:
 
 ## Preview behavior
 
-- Do not start the local presentation server unless the user explicitly asks for it.
+- Do not open a GUI browser unless the user explicitly asks for it.
+- A headless local server and browser may be used for visual validation without opening a desktop window.
 - Build and validate the self-contained static `presentations/<slug>/index.html`, then point the user to that file.
 - Ask before opening the static file in the user's default browser.
+
+## Theme and margin rules
+
+- Use a 1600×900 authored canvas unless the approved deck requires another size.
+- Keep desktop content inside a safe area of at least 48px vertically and 64px horizontally. Reserve at least 120px at the bottom-right when Reveal controls or slide numbers are enabled.
+- At narrow viewports, retain at least 24px horizontal padding. Reduce typography, gaps, or content density before reducing the safe area.
+- Cards and panels need at least 16px internal padding on desktop and 12px on narrow screens. Use 16–24px gaps between adjacent panels.
+- Keep clear separation between eyebrow, heading, content, callouts, and source notes. Source notes must remain inside the safe area and must not overlap controls.
+- Use `box-sizing: border-box`, prevent horizontal overflow, and test dense slides rather than assuming the title slide represents the theme.
+- Themes must define a clear type hierarchy, accessible contrast, consistent panel/border/radius treatment, readable tables and code, visible focus states, and restrained accent colors.
+- Reset Reveal defaults for custom primitives such as `pre.code`; verify that Markdown-looking text inside HTML containers does not become unintended headings or lists.
+
+## Visual validation
+
+After building, capture representative slides with a headless browser. Check at least a title slide, card grid, diagram, table, and code/dense slide.
+
+```bash
+npm run open -- <slug> --no-browser
+firefox --headless --window-size 1600,900 \
+  --screenshot /tmp/deck-theme-check.png \
+  'http://127.0.0.1:4173/presentations/<slug>/#/2' \
+  >/tmp/firefox-shot.log 2>&1
+test -s /tmp/deck-theme-check.png && echo screenshot-ok
+```
+
+Use the `read` tool to inspect `/tmp/deck-theme-check.png` as an image. Iterate until margins, hierarchy, overflow, wrapping, contrast, and visual balance are acceptable. Use different Reveal hashes to inspect other representative slides.
 
 ## Verification
 
