@@ -7,11 +7,12 @@
 - **Presentation themes:** nine accessible built-in presets plus installable external theme packages provide dark, light, editorial, and professional starting points.
 - **Source freshness:** SHA-256 validation detects generated decks that no longer match their source.
 - **Private by default:** local presentation content stays ignored by Git.
-- **Agent workflows included:** shared skills enforce content approval, theming, translation, and validation.
+- **Agent workflows included:** shared skills enforce content approval, theming, translation, validation, and written proposal generation.
+- **Proposal companions:** an approved deck can also produce a concise, styled PDF decision document with source freshness checks.
 
 ## Quick start
 
-Prerequisites: Node.js 20 or newer, Pandoc 3 or newer, and network access while building the embedded Reveal.js runtime. Firefox is a recommended optional dependency for automated 1600×900 headless screenshot validation; Chromium-family browsers are also supported as a fallback.
+Prerequisites: Node.js 20 or newer, Pandoc 3 or newer, and network access while building the embedded Reveal.js runtime. Firefox is a recommended optional dependency for automated 1600×900 headless screenshot validation; Chromium-family browsers are also supported as a fallback. Written proposal PDFs additionally require LibreOffice; Poppler tools are recommended for visual page review.
 
 ```bash
 git clone https://github.com/bartivs/deckseed.git
@@ -152,7 +153,23 @@ npm run build -- quarterly-strategy
 
 Pandoc produces `index.html` with the Reveal.js runtime, shared styles, deck theme, and media inline. `npm run bundle -- <slug>` remains a compatibility alias.
 
-### 5. Validate and preview
+### 5. Create an optional written proposal PDF
+
+A presentation can have a concise portrait proposal companion for decision-makers who need a printable narrative rather than slides. After approving its audience, continuity, outline, figures, and decision ask, create `presentations/<slug>/proposal.md` from `templates/proposal.md` and run:
+
+```bash
+npm run proposal -- quarterly-strategy
+```
+
+Deckseed uses Pandoc and the tracked reference DOCX to build a temporary Word document, then LibreOffice converts it into:
+
+```text
+presentations/quarterly-strategy/proposal.pdf
+```
+
+The ignored presentation directory also receives `proposal.sha256`. Validation hashes the proposal source, associated deck content, reference DOCX, page-break filter, and files under `proposal-assets/`, so deck/proposal drift is visible. A deck-specific `proposal-reference.docx` can override the default style. The `export-proposal-pdf` skill enforces the approval, continuity, privacy, build, and visual-review workflow.
+
+### 6. Validate and preview
 
 ```bash
 npm test
@@ -269,7 +286,7 @@ Yes. The generated `index.html` embeds its runtime and presentation assets. Netw
 
 ### Can Deckseed export PDF or PowerPoint?
 
-The primary artifact is self-contained HTML. Reveal.js presentations can be printed to PDF. Pandoc also supports PowerPoint output, but Deckseed does not currently wrap or validate that output path.
+The primary slide artifact is self-contained HTML. Deckseed also wraps and validates a separate written proposal PDF through `npm run proposal -- <slug>`; this is a portrait decision document, not a slide export. Reveal.js slides can still be printed to PDF. Pandoc supports PowerPoint output, but Deckseed does not currently wrap or validate that path.
 
 ### Does Deckseed require an AI service?
 
@@ -285,6 +302,7 @@ For a deck-specific variation, start from one of the nine presets and edit the i
 npm run new -- <slug> [options]  # Create ignored Pandoc sources
 npm run build -- <slug>          # Generate self-contained Reveal.js HTML
 npm run bundle -- <slug>         # Compatibility alias for build
+npm run proposal -- <slug>       # Generate a written proposal PDF companion
 npm run serve                    # Serve local decks on port 4173
 npm run open -- <slug>           # Start the server and open a deck
 npm run themes                   # List built-in and installed external themes
@@ -307,9 +325,12 @@ src/pandoc.css                Shared Reveal.js presentation styling
 src/theme-presets.js          Built-in generator theme presets
 scripts/theme-package.mjs     External theme manifest and CSS resolver
 scripts/build-deck.mjs        Pandoc build and self-contained-output checks
+scripts/build-proposal.mjs    Pandoc + LibreOffice proposal PDF build
 scripts/new-deck.mjs          Source scaffolding
 scripts/validate.mjs          Freshness, portability, and privacy validation
 templates/content.md          Tracked Pandoc starter source
+templates/proposal.md         Written proposal starter
+templates/proposal-reference.docx  Default proposal document styles
 presentations/                Ignored source decks and generated output
 docs/theme-previews/          README theme previews
 test/                         Deckseed tests

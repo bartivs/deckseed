@@ -12,6 +12,7 @@
     "new": "node scripts/new-deck.mjs",
     "build": "node scripts/build-deck.mjs",
     "bundle": "node scripts/build-deck.mjs",
+    "proposal": "node scripts/build-proposal.mjs",
     "serve": "node scripts/serve.mjs",
     "open": "node scripts/open.mjs",
     "themes:previews": "node scripts/generate-theme-previews.mjs",
