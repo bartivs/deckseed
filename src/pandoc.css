@@ -85,13 +85,145 @@ body { color: var(--harness-text); }
   box-shadow: var(--harness-shadow);
 }
 
+/* Reusable, dependency-free diagram primitives. */
+.diagram-compare,
+.diagram-converge,
+.diagram-lanes,
+.diagram-flow,
+.logo-strip { width: 100%; min-width: 0; }
+.diagram-compare {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 48px minmax(0, 1fr);
+  gap: 18px;
+  align-items: stretch;
+}
+.diagram-panel,
+.diagram-boundary {
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid var(--harness-border);
+  border-radius: var(--harness-radius);
+  background: color-mix(in srgb, var(--harness-panel) 88%, transparent);
+}
+.diagram-panel.before { border-color: color-mix(in srgb, #ff6b7a 52%, var(--harness-border)); }
+.diagram-panel.after { border-color: color-mix(in srgb, #72db9a 58%, var(--harness-border)); }
+.diagram-panel > :last-child,
+.diagram-boundary > :last-child { margin-bottom: 0; }
+.diagram-shift,
+.diagram-connector {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  color: var(--harness-accent);
+  font-weight: 900;
+  line-height: 1;
+}
+.diagram-shift { font-size: 1.7rem; }
+.diagram-flow {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 10px;
+}
+.diagram-flow.vertical { flex-direction: column; }
+.diagram-flow.vertical > .diagram-connector { min-height: 18px; transform: rotate(90deg); }
+.diagram-node {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  min-height: 58px;
+  flex: 1 1 0;
+  padding: 11px 13px;
+  border: 1px solid var(--harness-border);
+  border-radius: calc(var(--harness-radius) * .72);
+  background: color-mix(in srgb, var(--harness-panel) 78%, var(--harness-bg));
+  color: var(--harness-text);
+  text-align: center;
+  font-size: clamp(.62rem, .78vw, .8rem);
+  font-weight: 780;
+  line-height: 1.25;
+}
+.diagram-node.actor { border-color: color-mix(in srgb, #ae94ff 58%, var(--harness-border)); }
+.diagram-node.system { border-color: color-mix(in srgb, var(--harness-accent) 58%, var(--harness-border)); }
+.diagram-node.provider { border-color: color-mix(in srgb, #ffc857 55%, var(--harness-border)); }
+.diagram-node.gate { border-color: color-mix(in srgb, #ffc857 68%, var(--harness-border)); }
+.diagram-node.success { border-color: color-mix(in srgb, #72db9a 68%, var(--harness-border)); }
+.diagram-node.warning { border-color: color-mix(in srgb, #ff6b7a 68%, var(--harness-border)); }
+.diagram-node img { width: 24px; height: 24px; margin-bottom: 6px; object-fit: contain; }
+.diagram-converge {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 44px minmax(0, 1.2fr);
+  gap: 14px;
+  align-items: center;
+}
+.diagram-sources { display: grid; gap: 8px; min-width: 0; }
+.diagram-lanes { display: grid; gap: 10px; }
+.diagram-lane {
+  display: grid;
+  grid-template-columns: minmax(120px, .28fr) minmax(0, 1fr);
+  gap: 10px;
+  align-items: stretch;
+}
+.diagram-lane-label {
+  display: grid;
+  place-items: center;
+  padding: 12px;
+  border-radius: calc(var(--harness-radius) * .72);
+  background: color-mix(in srgb, var(--harness-accent) 10%, transparent);
+  color: var(--harness-accent);
+  text-align: center;
+  font-size: .72rem;
+  font-weight: 850;
+}
+.diagram-boundary { position: relative; border-style: dashed; }
+.diagram-boundary-label {
+  display: inline-block;
+  margin: -32px 0 12px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--harness-bg);
+  color: var(--harness-muted);
+  font-size: .6rem;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.diagram-caption { margin: 12px 0 0; color: var(--harness-muted); font-size: .7rem; line-height: 1.4; }
+.logo-strip { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.tech-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 8px 11px;
+  border: 1px solid var(--harness-border);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--harness-panel) 76%, transparent);
+  color: var(--harness-text);
+  font-size: .64rem;
+  font-weight: 760;
+}
+.tech-logo img { width: 20px; height: 20px; object-fit: contain; }
+
 @media (max-width: 800px) {
-  .card-grid { grid-template-columns: 1fr; }
+  .card-grid,
+  .diagram-compare,
+  .diagram-converge { grid-template-columns: 1fr; }
+  .diagram-shift,
+  .diagram-converge > .diagram-connector { min-height: 28px; transform: rotate(90deg); }
+  .diagram-flow:not(.keep-horizontal) { flex-direction: column; }
+  .diagram-flow:not(.keep-horizontal) > .diagram-connector { min-height: 18px; transform: rotate(90deg); }
+  .diagram-lane { grid-template-columns: 1fr; }
 }
 
 @media print {
   html, body { color: #111; background: #fff; }
   .reveal .slides > section { color: #111; background: #fff; }
   .reveal h1, .reveal h2, .reveal h3 { color: #111; }
-  .card { color: #111; background: #f5f7fa; box-shadow: none; }
+  .card,
+  .diagram-panel,
+  .diagram-boundary,
+  .diagram-node,
+  .tech-logo { color: #111; background: #f5f7fa; box-shadow: none; }
+  .diagram-boundary-label { color: #333; background: #fff; }
 }

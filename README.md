@@ -131,6 +131,19 @@ Fewer priorities create faster delivery.
 
 Horizontal rules separate slides. Use ordinary Markdown by default, fenced divs for layout groups, and trusted local HTML only when a visual treatment requires it.
 
+### Reusable diagrams
+
+The shared stylesheet includes dependency-free HTML/CSS primitives for executive and technical diagrams:
+
+- `.diagram-compare` with `.diagram-panel.before` and `.diagram-panel.after`;
+- `.diagram-flow`, `.diagram-node`, and `.diagram-connector` for process flows;
+- `.diagram-converge` and `.diagram-sources` for many-to-one systems;
+- `.diagram-lanes` and `.diagram-lane` for responsibility swimlanes;
+- `.diagram-boundary` for trust or ownership boundaries;
+- `.logo-strip` and `.tech-logo` for local, embedded technology marks.
+
+Node modifiers include `.actor`, `.system`, `.provider`, `.gate`, `.success`, and `.warning`. Build diagram groups with `<div>` elements rather than nested `<section>` elements, which Reveal interprets as slides. The primitives stack on narrow screens, retain theme variables, and print without JavaScript. Keep logos as local presentation assets so source hashes and self-contained builds remain reproducible. The generated starter deck contains a before/after example.
+
 ### 4. Generate the presentation
 
 ```bash

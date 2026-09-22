@@ -21,7 +21,7 @@ compatibility: Node.js 20 or newer; Pandoc 3 or newer
    ```
 
 5. Replace the starter material in `presentations/<slug>/content.md` with the approved metadata and complete slide copy. This file is both the approval artifact and Pandoc source.
-6. Use Pandoc Markdown, fenced divs, and minimal trusted local HTML only when a visual layout needs it. Never edit generated `index.html`.
+6. Use Pandoc Markdown, fenced divs, and minimal trusted local HTML only when a visual layout needs it. Prefer the shared `.diagram-*` and `.tech-logo` primitives for flows, comparisons, swimlanes, boundaries, and local technology marks. Use `<div>` rather than nested `<section>` elements inside a slide because Reveal treats nested sections as slide structure. Never edit generated `index.html`.
 7. Customize `theme.css` only for deck-specific visual requirements. With an external theme package, this file is a local override layer; the package CSS is resolved at build time and is never copied into the deck.
 8. Build and validate:
 

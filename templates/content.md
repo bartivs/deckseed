@@ -49,3 +49,31 @@ Navigation, print, fullscreen, and touch support come from Reveal.js.
 </div>
 
 <footer class="slide-footer">`content.md` is the approved source; `index.html` is generated.</footer>
+
+---
+
+<div class="eyebrow">Diagram example</div>
+
+# Show a change, not another list
+
+<div class="diagram-compare">
+<div class="diagram-panel before">
+<h3>Before</h3>
+<div class="diagram-flow">
+<div class="diagram-node actor">Individual work</div>
+<div class="diagram-connector" aria-hidden="true">→</div>
+<div class="diagram-node warning">Fragmented result</div>
+</div>
+</div>
+<div class="diagram-shift" aria-hidden="true">⇒</div>
+<div class="diagram-panel after">
+<h3>After</h3>
+<div class="diagram-flow">
+<div class="diagram-node actor">Shared intent</div>
+<div class="diagram-connector" aria-hidden="true">→</div>
+<div class="diagram-node success">Governed result</div>
+</div>
+</div>
+</div>
+
+<footer class="slide-footer">Shared diagram primitives need no JavaScript or external assets.</footer>
