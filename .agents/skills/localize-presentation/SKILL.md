@@ -19,12 +19,15 @@ The Pandoc pipeline uses one language per source deck. Localization produces a s
    ```
 
 3. Translate the complete source from the original `content.md` into the new `content.md`:
-   - preserve slide order and visual classes;
+   - preserve the exact source slide order, including any intentionally non-numeric narrative ordering;
+   - map localized blocks by their source slide identity/title, never by assuming numeric labels equal file order;
+   - preserve visual classes and structural wrappers;
    - translate headings, body text, labels, footers, notes, alt text, and metadata;
    - set `lang` to the target BCP 47 language code;
    - preserve facts, URLs, numbers, and approved caveats.
 4. Copy only necessary deck-specific CSS adjustments into the localized `theme.css`.
-5. Build and validate both decks:
+5. Compare localized and source slide counts and ordered title sequence before building.
+6. Build and validate both decks:
 
    ```bash
    npm run build -- <slug>

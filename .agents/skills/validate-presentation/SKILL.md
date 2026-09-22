@@ -73,7 +73,7 @@ else
 fi
 ```
 
-Use the `read` tool to inspect `/tmp/deck-theme-check.png` as an image. Do not treat a successful screenshot command as visual approval. The default-browser fallback does not produce an inspectable PNG, so do not mark visual validation complete until the user confirms the manual result or a supported headless browser becomes available. Review at least:
+Use the `read` tool to inspect `/tmp/deck-theme-check.png` as an image. Inspect both the full frame and its bottom 140px safety strip. Do not treat a successful screenshot command as visual approval. The default-browser fallback does not produce an inspectable PNG, so do not mark visual validation complete until the user confirms the manual result or a supported headless browser becomes available. Review at least:
 
 - the title slide;
 - a multi-card grid;
@@ -84,10 +84,12 @@ Use the `read` tool to inspect `/tmp/deck-theme-check.png` as an image. Do not t
 For each screenshot, verify:
 
 - at least 48px vertical and 64px horizontal desktop safe area;
+- at least 96px reserved bottom budget for source notes, progress, controls, and slide numbers;
 - no content, source note, control, or slide number overlap;
 - at least 16px card padding and 16–24px inter-panel gaps;
 - readable heading hierarchy without oversized wrapping;
 - no accidental Markdown rendering inside raw HTML or code panels;
+- no authored content in the bottom 140px safety strip except source notes and controls;
 - no clipping, horizontal scrollbars, dense-slide overflow, or excessive dead space;
 - adequate text, muted-text, border, and accent contrast.
 

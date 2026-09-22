@@ -23,7 +23,9 @@ External themes may be installed as npm packages or supplied as local directorie
 - Use 16–24px gaps between cards, panels, table regions, and diagram nodes.
 - Give cards at least 16px internal padding on desktop and 12px on narrow screens.
 - Preserve distinct spacing between eyebrow, heading, main content, verdict/callout, and source note.
+- Reserve at least 96px at the bottom for source notes, progress, controls, and slide numbers. Keep authored content out of the bottom 140px safety strip.
 - Reduce typography, gaps, or content density before shrinking safe-area margins.
+- Treat `overflow: hidden` as a last-resort clipping guard, not a layout solution. A slide must fit before clipping is applied.
 
 ### Visual system
 
@@ -34,6 +36,7 @@ External themes may be installed as npm packages or supplied as local directorie
 - Ensure body text, muted text, borders, links, tables, and code remain readable against every surface.
 - Keep diagrams visually distinct from cards while sharing the same spacing and color system.
 - Reset Reveal defaults for custom elements such as `pre.code`, tables, and raw HTML containers. Markdown-looking text inside a custom panel must render literally, not as unintended headings or lists.
+- Use `<pre class="code">` for multiline code, event, and template content; test that line breaks survive Pandoc and browser rendering.
 - Define visible keyboard focus states and usable print styles.
 
 ### Visual review
@@ -61,7 +64,7 @@ Do not approve a theme from the title slide alone. Build and inspect representat
    npm run validate
    ```
 
-8. Run the headless screenshot review, inspect each PNG with the `read` tool, and iterate on margins, wrapping, contrast, overflow, and visual balance.
+8. Run the headless screenshot review, inspect each PNG and its bottom safety strip with the `read` tool, and iterate on margins, wrapping, contrast, overflow, and visual balance.
 
 ## Constraints
 

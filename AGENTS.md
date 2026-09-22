@@ -57,7 +57,10 @@ Use the shared Agent Skills under `.agents/skills/`:
 - At narrow viewports, retain at least 24px horizontal padding. Reduce typography, gaps, or content density before reducing the safe area.
 - Cards and panels need at least 16px internal padding on desktop and 12px on narrow screens. Use 16–24px gaps between adjacent panels.
 - Keep clear separation between eyebrow, heading, content, callouts, and source notes. Source notes must remain inside the safe area and must not overlap controls.
+- Reserve a bottom content budget of at least 96px for source notes, progress, controls, and slide numbers. Never place a verdict, callout, card edge, or table row in that reserved zone.
 - Use `box-sizing: border-box`, prevent horizontal overflow, and test dense slides rather than assuming the title slide represents the theme.
+- Treat `overflow: hidden` as a final clipping guard, never as a way to hide content that does not fit. Reduce type, gaps, padding, or content before clipping.
+- Use `<pre class="code">` for every multiline code/event/template panel. Never put Markdown-looking lines beginning with `#`, `-`, or `*` in a normal HTML `<div>`.
 - Themes must define a clear type hierarchy, accessible contrast, consistent panel/border/radius treatment, readable tables and code, visible focus states, and restrained accent colors.
 - Reset Reveal defaults for custom primitives such as `pre.code`; verify that Markdown-looking text inside HTML containers does not become unintended headings or lists.
 
@@ -98,7 +101,7 @@ else
 fi
 ```
 
-Use the `read` tool to inspect `/tmp/deck-theme-check.png` as an image. Iterate until margins, hierarchy, overflow, wrapping, contrast, and visual balance are acceptable. Use different Reveal hashes to inspect other representative slides.
+Use the `read` tool to inspect `/tmp/deck-theme-check.png` as an image. Inspect the full frame and the bottom 140px safety strip; no authored content may be clipped or enter the reserved control/source-note zone. Iterate until margins, hierarchy, overflow, wrapping, contrast, and visual balance are acceptable. Use different Reveal hashes to inspect other representative slides.
 
 The default-browser fallback is manual only: it does not create a screenshot. Do not claim visual validation is complete unless the user confirms the result or a screenshot-capable browser is installed and its PNG has been inspected.
 
