@@ -22,7 +22,7 @@ External themes may be installed as npm packages or supplied as local directorie
 - Keep at least 24px horizontal padding on narrow screens.
 - Use 16–24px gaps between cards, panels, table regions, and diagram nodes.
 - Give cards at least 16px internal padding on desktop and 12px on narrow screens.
-- Preserve distinct spacing between eyebrow, heading, main content, verdict/callout, and source note.
+- Preserve distinct spacing between eyebrow, heading, main content, verdict/callout, and source note; use explicit selectors whose specificity survives broad Reveal resets.
 - Reserve at least 96px at the bottom for source notes, progress, controls, and slide numbers. Keep authored content out of the bottom 140px safety strip.
 - Reduce typography, gaps, or content density before shrinking safe-area margins.
 - Treat `overflow: hidden` as a last-resort clipping guard, not a layout solution. A slide must fit before clipping is applied.

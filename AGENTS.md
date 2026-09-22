@@ -57,6 +57,7 @@ Use the shared Agent Skills under `.agents/skills/`:
 - At narrow viewports, retain at least 24px horizontal padding. Reduce typography, gaps, or content density before reducing the safe area.
 - Cards and panels need at least 16px internal padding on desktop and 12px on narrow screens. Use 16–24px gaps between adjacent panels.
 - Keep clear separation between eyebrow, heading, content, callouts, and source notes. Source notes must remain inside the safe area and must not overlap controls.
+- Give stacked content blocks an explicit vertical gap; verify the computed style when a broad reset such as `.reveal p { margin-top: 0 }` could override component spacing.
 - Reserve a bottom content budget of at least 96px for source notes, progress, controls, and slide numbers. Never place a verdict, callout, card edge, or table row in that reserved zone.
 - Use `box-sizing: border-box`, prevent horizontal overflow, and test dense slides rather than assuming the title slide represents the theme.
 - Treat `overflow: hidden` as a final clipping guard, never as a way to hide content that does not fit. Reduce type, gaps, padding, or content before clipping.

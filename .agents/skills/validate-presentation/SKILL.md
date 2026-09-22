@@ -86,6 +86,7 @@ For each screenshot, verify:
 - at least 48px vertical and 64px horizontal desktop safe area;
 - at least 96px reserved bottom budget for source notes, progress, controls, and slide numbers;
 - no content, source note, control, or slide number overlap;
+- visible vertical separation between stacked cards, verdicts, callouts, tables, and code panels;
 - at least 16px card padding and 16–24px inter-panel gaps;
 - readable heading hierarchy without oversized wrapping;
 - no accidental Markdown rendering inside raw HTML or code panels;
