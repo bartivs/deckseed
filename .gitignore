@@ -1,6 +1,8 @@
 # Presentation content is intentionally local and must never be committed.
 presentations/*
 !presentations/.gitkeep
+# Generated deck copies at the repository root
+/index_*.html
 
 # Local/editor output
 .DS_Store
