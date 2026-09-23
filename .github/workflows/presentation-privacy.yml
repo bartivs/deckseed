@@ -1,0 +1,33 @@
+name: Presentation privacy
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  reject-ignored-content:
+    name: Reject tracked ignored presentation files
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Fail if ignored files are tracked
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          ignored_files="$(git ls-files -ci --exclude-standard)"
+          if [[ -n "$ignored_files" ]]; then
+            echo "The following ignored files are tracked and must not be pushed:"
+            printf '%s\n' "$ignored_files"
+            echo
+            echo "Presentation content must remain outside the harness repository."
+            echo "Remove these files from Git and commit again; use git rm --cached for already-tracked files."
+            exit 1
+          fi
+
+          echo "No ignored files are tracked."
